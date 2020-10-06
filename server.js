@@ -1,11 +1,17 @@
 const express = require('express');
+const cors = require('cors');
 require('dotenv').config();
 
 require('./configs/db-config'); // connect to DB
 
 const app = express();
-
-
+app.use(cors({
+  origin: 'http://localhost:3000',
+  methods: 'GET,POST,PUT,PATCH,DELETE',
+  allowedHeaders: 'Content-Type,X-Requested-With',
+  credentials: true,
+  maxAge: 3600
+}));
 app.use(express.json({ extended: false }));
 
 const PORT = process.env.PORT || 5000;
