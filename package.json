@@ -8,5 +8,13 @@
     "start": "node server.js"
   },
   "author": "Jason Rupert Hudson",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "mysql2": "^2.2.5"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
 }
