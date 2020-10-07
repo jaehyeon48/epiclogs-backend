@@ -1,6 +1,9 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
+// @ROUTE         GET api/auth/login/google/credential
+// @DESCRIPTION   Google auth redirection url
+// @ACCESS        Public
 function makeTokenForGoogleAuth(req, res) {
   const jwtPayload = {
     user: { id: req.user }
