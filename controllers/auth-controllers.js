@@ -60,9 +60,18 @@ async function makeTokenForGithubAuth(req, res) {
   });
 }
 
+// @ROUTE         GET api/auth/logout
+// @DESCRIPTION   Logout the user
+// @ACCESS        Private
+function logout(req, res) {
+  res.status(200).cookie('token', '', { httpOnly: true, maxAge: '-1' }).json({ successMsg: 'Successfully logged out' });
+}
+
+
 module.exports = {
   checkAuthController,
   loginWithGithub,
   makeTokenForGoogleAuth,
-  makeTokenForGithubAuth
+  makeTokenForGithubAuth,
+  logout
 };
