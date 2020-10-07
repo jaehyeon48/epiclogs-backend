@@ -1,5 +1,5 @@
-const fs = require('fs');
 const AWS = require('aws-sdk');
+require('dotenv').config();
 
 const ID = process.env.AWS_ID;
 const SECRET = process.env.AWS_SECRET;
