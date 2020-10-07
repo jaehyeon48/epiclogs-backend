@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const passport = require('passport');
+const cookieParser = require('cookie-parser');
 require('./configs/passport-config');
 require('dotenv').config();
 
@@ -15,7 +16,7 @@ app.use(cors({
   maxAge: 3600
 }));
 app.use(express.json({ extended: false }));
-
+app.use(cookieParser());
 app.use(passport.initialize());
 
 app.use('/api/auth', require('./routes/auth-route'));

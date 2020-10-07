@@ -3,8 +3,16 @@ const passport = require('passport');
 const router = express.Router();
 
 const {
+  checkAuthController,
   makeTokenForGoogleAuth
 } = require('../controllers/auth-controllers');
+
+const authMiddleware = require('../middlewares/auth-middleware');
+
+// @ROUTE         GET api/auth/check
+// @DESCRIPTION   check authentication
+// @ACCESS        Private
+router.get('/check', authMiddleware, checkAuthController);
 
 
 // @ROUTE         GET api/auth/login/google
