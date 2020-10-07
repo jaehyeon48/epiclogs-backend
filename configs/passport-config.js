@@ -39,19 +39,20 @@ passport.use(new GoogleStrategy({
       done(null, isUserExist[0].userId);
     }
     else { // if the user does not exist, sign up the new user
+      let avatarFileName = null;
       if (avatar) {
         // if the avatar (image of the user) from google is exist, convert it into new file name
         // and save into the Amazon S3 bucket & DB
         const avatarImage = await axios.get(avatar, { responseType: 'arraybuffer' }); // download avatar
         const avatarExtension = avatar.match(/(.jpg|jpeg|.png)$/)[0];
-        const avatarFileName = `${uuidv4()}.${avatarExtension}`;
+        avatarFileName = `${uuidv4()}.${avatarExtension}`;
         uploadAvatarToS3(avatarFileName, Buffer.from(avatarImage.data, 'base64'));
-        const [newUserId] = await pool.query(`
+      }
+      const [newUserId] = await pool.query(`
         INSERT INTO user(firstName, lastName, email, password, avatar, authType)
         VALUES ('${firstName}', '${lastName}', '${email}', null, '${avatarFileName}', 'google');`);
 
-        done(null, newUserId.insertId);
-      }
+      done(null, newUserId.insertId);
     }
   } catch (error) {
     console.log(error);
