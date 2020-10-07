@@ -37,11 +37,16 @@ function makeTokenForGoogleAuth(req, res) {
     user: { id: req.user }
   };
 
-  jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '12h' }, (err, token) => { // set expiresIn 12h for testing purpose.
-    if (err) throw err;
-    res.cookie('token', token, { httpOnly: true });
-    res.redirect('http://localhost:3000');
-  });
+  try {
+    jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '12h' }, (err, token) => { // set expiresIn 12h for testing purpose.
+      if (err) throw err;
+      res.cookie('token', token, { httpOnly: true });
+      res.redirect('http://localhost:3000');
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ errorMsg: 'Internal Server Error' });
+  }
 }
 
 
@@ -53,11 +58,16 @@ async function makeTokenForGithubAuth(req, res) {
     user: { id: req.githubUserId }
   };
 
-  jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '12h' }, (err, token) => { // set expiresIn 12h for testing purpose.
-    if (err) throw err;
-    res.cookie('token', token, { httpOnly: true });
-    res.redirect('http://localhost:3000');
-  });
+  try {
+    jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '12h' }, (err, token) => { // set expiresIn 12h for testing purpose.
+      if (err) throw err;
+      res.cookie('token', token, { httpOnly: true });
+      res.redirect('http://localhost:3000');
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ errorMsg: 'Internal Server Error' });
+  }
 }
 
 // @ROUTE         GET api/auth/logout
@@ -66,7 +76,6 @@ async function makeTokenForGithubAuth(req, res) {
 function logout(req, res) {
   res.status(200).cookie('token', '', { httpOnly: true, maxAge: '-1' }).json({ successMsg: 'Successfully logged out' });
 }
-
 
 module.exports = {
   checkAuthController,
