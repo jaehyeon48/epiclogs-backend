@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const pool = require('../configs/db-config');
+const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
 
@@ -77,10 +78,49 @@ function logout(req, res) {
   res.status(200).cookie('token', '', { httpOnly: true, maxAge: '-1' }).json({ successMsg: 'Successfully logged out' });
 }
 
+
+// @ROUTE         POST api/auth/signup
+// @DESCRIPTION   Register user in local
+// @ACCESS        Public
+async function signUp(req, res) {
+  const { firstName, lastName, email, password } = req.body;
+
+  try {
+    const checkExistUser = await pool.query(`SELECT userId FROM user WHERE email = '${email}' AND authType = 'local'`);
+
+    if (checkExistUser[0].length !== 0) {
+      return res.status(400).json({ errorMsg: 'User already exists!' });
+    }
+
+    const encryptedPassword = await bcrypt.hash(password, 10);
+
+    const [newUser] = await pool.query(
+      `INSERT INTO user (firstName, lastName, email, password, authType)
+       VALUES ('${firstName}', '${lastName}' ,'${email}', '${encryptedPassword}', 'local')`);
+
+    const jwtPayload = {
+      user: { id: newUser.insertId }
+    };
+
+    jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '12h' }, (err, token) => { // set expiresIn 12h for testing purpose.
+      if (err) throw err;
+      // for deployment
+      // res.status(201).cookie('token', token, { httpOnly: true, sameSite: 'none', secure: true }).json({ successMsg: 'User successfully created.' });
+
+      // for development
+      res.status(201).cookie('token', token, { httpOnly: true }).json({ successMsg: 'User successfully created.' });
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ errorMsg: 'Internal Server Error' });
+  }
+}
+
 module.exports = {
   checkAuthController,
   loginWithGithub,
   makeTokenForGoogleAuth,
   makeTokenForGithubAuth,
-  logout
+  logout,
+  signUp
 };

@@ -7,7 +7,8 @@ const {
   loginWithGithub,
   makeTokenForGoogleAuth,
   makeTokenForGithubAuth,
-  logout
+  logout,
+  signUp
 } = require('../controllers/auth-controllers');
 
 const authMiddleware = require('../middlewares/auth-middleware');
@@ -45,6 +46,12 @@ router.get('/login/github/credential', githubAuthMiddleware, makeTokenForGithubA
 // @DESCRIPTION   Logout the user
 // @ACCESS        Private
 router.get('/logout', authMiddleware, logout);
+
+
+// @ROUTE         POST api/auth/signup
+// @DESCRIPTION   Register user in local
+// @ACCESS        Public
+router.post('/signup', signUp);
 
 
 module.exports = router;
