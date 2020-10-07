@@ -4,6 +4,7 @@ const router = express.Router();
 
 const {
   checkAuthController,
+  loginLocal,
   loginWithGithub,
   makeTokenForGoogleAuth,
   makeTokenForGithubAuth,
@@ -52,6 +53,12 @@ router.get('/logout', authMiddleware, logout);
 // @DESCRIPTION   Register user in local
 // @ACCESS        Public
 router.post('/signup', signUp);
+
+
+// @ROUTE         POST api/auth/login/local
+// @DESCRIPTION   Login user in local
+// @ACCESS        Public
+router.post('/login/local', loginLocal);
 
 
 module.exports = router;

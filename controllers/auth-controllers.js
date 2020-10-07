@@ -116,8 +116,47 @@ async function signUp(req, res) {
   }
 }
 
+
+// @ROUTE         POST api/auth/login/local
+// @DESCRIPTION   Login user in local
+// @ACCESS        Public
+async function loginLocal(req, res) {
+  const { email, password } = req.body;
+
+  try {
+    const [userRow] = await pool.query(`SELECT userId, password FROM user WHERE email = '${email}' AND authType = 'local'`);
+
+    if (userRow[0] === undefined) {
+      return res.status(400).json({ errorMsg: 'Email or password is invalid.' });
+    }
+
+    const isPasswordMatch = await bcrypt.compare(password, userRow[0].password);
+
+    if (!isPasswordMatch) {
+      return res.status(400).json({ errorMsg: 'Email or password is invalid.' });
+    }
+
+    const jwtPayload = {
+      user: { id: userRow[0].userId }
+    };
+
+    jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '12h' }, (err, token) => { // set expiresIn 12h for testing purpose.
+      if (err) throw err;
+      // for deployment
+      // res.status(200).cookie('token', token, { httpOnly: true, sameSite: 'none', secure: true }).json({ successMsg: 'Login success.' });
+
+      // for development
+      res.status(200).cookie('token', token, { httpOnly: true }).json({ successMsg: 'Login success.' });
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ errorMsg: 'Internal Server Error' });
+  }
+}
+
 module.exports = {
   checkAuthController,
+  loginLocal,
   loginWithGithub,
   makeTokenForGoogleAuth,
   makeTokenForGithubAuth,
