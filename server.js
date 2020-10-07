@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const passport = require('passport');
 require('./configs/passport-config');
 require('dotenv').config();
 
@@ -14,6 +15,8 @@ app.use(cors({
   maxAge: 3600
 }));
 app.use(express.json({ extended: false }));
+
+app.use(passport.initialize());
 
 app.use('/api/auth', require('./routes/auth-route'));
 
