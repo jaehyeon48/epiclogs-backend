@@ -49,8 +49,8 @@ passport.use(new GoogleStrategy({
         uploadAvatarToS3(avatarFileName, Buffer.from(avatarImage.data, 'base64'));
       }
       const [newUserId] = await pool.query(`
-        INSERT INTO user(firstName, lastName, email, password, avatar, authType)
-        VALUES ('${firstName}', '${lastName}', '${email}', null, '${avatarFileName}', 'google');`);
+        INSERT INTO user(firstName, lastName, email, avatar, authType)
+        VALUES ('${firstName}', '${lastName}', '${email}', '${avatarFileName}', 'google');`);
 
       done(null, newUserId.insertId);
     }
