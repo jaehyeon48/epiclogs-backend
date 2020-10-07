@@ -9,7 +9,7 @@ require('dotenv').config();
 async function checkAuthController(req, res) {
   const userId = req.user.id;
   try {
-    const [userRow] = await pool.query(`SELECT userId, firstName, lastName, email, avatar FROM user WHERE userId = ${userId}`);
+    const [userRow] = await pool.query(`SELECT userId, firstName, lastName, email, avatar, authType FROM user WHERE userId = ${userId}`);
 
     return res.status(200).json(userRow[0]);
   } catch (err) {
