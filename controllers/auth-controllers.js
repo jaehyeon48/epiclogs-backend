@@ -19,6 +19,16 @@ async function checkAuthController(req, res) {
 }
 
 
+// @ROUTE         GET api/auth/login/github
+// @DESCRIPTION   Login user with Github
+// @ACCESS        Public
+async function loginWithGithub(req, res) {
+  const githubClientId = process.env.GITHUB_CLIENT_ID;
+  const redirectURI = 'http://localhost:5000/api/auth/login/github/credential'
+  res.redirect(`https://github.com/login/oauth/authorize?client_id=${githubClientId}&redirect_uri=${redirectURI}&scope=user`);
+}
+
+
 // @ROUTE         GET api/auth/login/google/credential
 // @DESCRIPTION   Google auth redirection url
 // @ACCESS        Public
@@ -34,7 +44,25 @@ function makeTokenForGoogleAuth(req, res) {
   });
 }
 
+
+// @ROUTE         GET api/auth/login/github/credential
+// @DESCRIPTION   Github auth redirection url
+// @ACCESS        Public
+async function makeTokenForGithubAuth(req, res) {
+  const jwtPayload = {
+    user: { id: req.githubUserId }
+  };
+
+  jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '12h' }, (err, token) => { // set expiresIn 12h for testing purpose.
+    if (err) throw err;
+    res.cookie('token', token, { httpOnly: true });
+    res.redirect('http://localhost:3000');
+  });
+}
+
 module.exports = {
   checkAuthController,
-  makeTokenForGoogleAuth
+  loginWithGithub,
+  makeTokenForGoogleAuth,
+  makeTokenForGithubAuth
 };
