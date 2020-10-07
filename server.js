@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+require('./configs/passport-config');
 require('dotenv').config();
 
 require('./configs/db-config'); // connect to DB
