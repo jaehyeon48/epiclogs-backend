@@ -20,8 +20,6 @@
     "googleapis": "^61.0.0",
     "jsonwebtoken": "^8.5.1",
     "mysql2": "^2.2.5",
-    "passport": "^0.4.1",
-    "passport-google-oauth20": "^2.0.0",
     "uuid": "^8.3.1"
   },
   "devDependencies": {

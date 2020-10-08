@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const pool = require('../configs/db-config');
 const bcrypt = require('bcryptjs');
+const { google } = require('googleapis');
 require('dotenv').config();
 
 
@@ -19,36 +20,54 @@ async function checkAuthController(req, res) {
   }
 }
 
+async function loginWithGoogle(req, res) {
+  const oauth2Client = new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    process.env.GOOGLE_CALLBACK_URI
+  );
 
-// @ROUTE         GET api/auth/login/github
-// @DESCRIPTION   Login user with Github
-// @ACCESS        Public
-async function loginWithGithub(req, res) {
-  const githubClientId = process.env.GITHUB_CLIENT_ID;
-  const redirectURI = 'http://epiclogs.herokuapp.com/api/auth/login/github/credential'
-  res.redirect(`https://github.com/login/oauth/authorize?client_id=${githubClientId}&redirect_uri=${redirectURI}&scope=user`);
+  const scopes = [
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile'
+  ];
+
+  const authUrl = oauth2Client.generateAuthUrl({
+    access_type: 'offline',
+    scope: scopes
+  });
+
+  res.redirect(authUrl);
 }
 
 
-// @ROUTE         GET api/auth/login/google/credential
-// @DESCRIPTION   Google auth redirection url
+// @ROUTE         GET api/auth/login/google-callback
+// @DESCRIPTION   Github auth redirection url
 // @ACCESS        Public
-function makeTokenForGoogleAuth(req, res) {
+async function makeTokenForGoogleAuth(req, res) {
   const jwtPayload = {
-    user: { id: req.user }
+    user: { id: req.googleUserId }
   };
 
   try {
     jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '12h' }, (err, token) => { // set expiresIn 12h for testing purpose.
       if (err) throw err;
       res.cookie('token', token, { httpOnly: true, sameSite: 'none', secure: true });
-      // redirect to provided url after google auth successfully processed
-      res.redirect('https://epiclogs.tk');
+      res.redirect('http://localhost:3000');
     });
   } catch (error) {
     console.log(error);
     res.status(500).json({ errorMsg: 'Internal Server Error' });
   }
+}
+
+// @ROUTE         GET api/auth/login/github
+// @DESCRIPTION   Login user with Github
+// @ACCESS        Public
+async function loginWithGithub(req, res) {
+  const githubClientId = process.env.GITHUB_CLIENT_ID;
+  const redirectURI = 'http://localhost:5000/api/auth/login/github/credential'
+  res.redirect(`https://github.com/login/oauth/authorize?client_id=${githubClientId}&redirect_uri=${redirectURI}&scope=user`);
 }
 
 
@@ -64,8 +83,7 @@ async function makeTokenForGithubAuth(req, res) {
     jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '12h' }, (err, token) => { // set expiresIn 12h for testing purpose.
       if (err) throw err;
       res.cookie('token', token, { httpOnly: true, sameSite: 'none', secure: true });
-      // redirect to provided url after github auth successfully processed
-      res.redirect('https://epiclogs.tk');
+      res.redirect('http://localhost:3000');
     });
   } catch (error) {
     console.log(error);
@@ -157,5 +175,6 @@ module.exports = {
   makeTokenForGoogleAuth,
   makeTokenForGithubAuth,
   logout,
-  signUp
+  signUp,
+  loginWithGoogle,
 };
