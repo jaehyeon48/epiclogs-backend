@@ -53,7 +53,7 @@ async function makeTokenForGoogleAuth(req, res) {
     jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '12h' }, (err, token) => { // set expiresIn 12h for testing purpose.
       if (err) throw err;
       res.cookie('token', token, { httpOnly: true, sameSite: 'none', secure: true });
-      res.redirect(process.env.OAUTH_REDIRECT_URL);
+      res.status(200).json({ successMsg: 'User successfully logged in with google.' });
     });
   } catch (error) {
     console.log(error);
