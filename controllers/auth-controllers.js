@@ -41,7 +41,7 @@ function makeTokenForGoogleAuth(req, res) {
   try {
     jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '12h' }, (err, token) => { // set expiresIn 12h for testing purpose.
       if (err) throw err;
-      res.cookie('token', token, { httpOnly: true });
+      res.cookie('token', token, { httpOnly: true, sameSite: 'none', secure: true });
       // redirect to provided url after google auth successfully processed
       res.redirect('https://epiclogs.tk');
     });
@@ -63,7 +63,7 @@ async function makeTokenForGithubAuth(req, res) {
   try {
     jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '12h' }, (err, token) => { // set expiresIn 12h for testing purpose.
       if (err) throw err;
-      res.cookie('token', token, { httpOnly: true });
+      res.cookie('token', token, { httpOnly: true, sameSite: 'none', secure: true });
       // redirect to provided url after github auth successfully processed
       res.redirect('https://epiclogs.tk');
     });
@@ -77,7 +77,7 @@ async function makeTokenForGithubAuth(req, res) {
 // @DESCRIPTION   Logout the user
 // @ACCESS        Private
 function logout(req, res) {
-  res.status(200).cookie('token', '', { httpOnly: true, maxAge: '-1' }).json({ successMsg: 'Successfully logged out' });
+  res.status(200).cookie('token', '', { httpOnly: true, sameSite: 'none', secure: true, maxAge: '-1' }).json({ successMsg: 'Successfully logged out' });
 }
 
 
@@ -106,11 +106,8 @@ async function signUp(req, res) {
 
     jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '12h' }, (err, token) => { // set expiresIn 12h for testing purpose.
       if (err) throw err;
-      // for deployment
-      // res.status(201).cookie('token', token, { httpOnly: true, sameSite: 'none', secure: true }).json({ successMsg: 'User successfully created.' });
 
-      // for development
-      res.status(201).cookie('token', token, { httpOnly: true }).json({ successMsg: 'User successfully created.' });
+      res.status(201).cookie('token', token, { httpOnly: true, sameSite: 'none', secure: true }).json({ successMsg: 'User successfully created.' });
     });
   } catch (error) {
     console.log(error);
@@ -144,11 +141,8 @@ async function loginLocal(req, res) {
 
     jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '12h' }, (err, token) => { // set expiresIn 12h for testing purpose.
       if (err) throw err;
-      // for deployment
-      // res.status(200).cookie('token', token, { httpOnly: true, sameSite: 'none', secure: true }).json({ successMsg: 'Login success.' });
 
-      // for development
-      res.status(200).cookie('token', token, { httpOnly: true }).json({ successMsg: 'Login success.' });
+      res.status(200).cookie('token', token, { httpOnly: true, sameSite: 'none', secure: true }).json({ successMsg: 'Login success.' });
     });
   } catch (error) {
     console.log(error);
