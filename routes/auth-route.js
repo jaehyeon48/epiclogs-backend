@@ -42,7 +42,7 @@ router.get('/login/github', loginWithGithub);
 // @ROUTE         GET api/auth/login/github-callback
 // @DESCRIPTION   Github auth redirection url
 // @ACCESS        Public
-router.get('/login/github/credential', githubAuthMiddleware, makeTokenForGithubAuth);
+router.get('/login/github-callback', githubAuthMiddleware, makeTokenForGithubAuth);
 
 // @ROUTE         GET api/auth/logout
 // @DESCRIPTION   Logout the user
