@@ -53,7 +53,7 @@ async function makeTokenForGoogleAuth(req, res) {
     jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '12h' }, (err, token) => { // set expiresIn 12h for testing purpose.
       if (err) throw err;
       res.cookie('token', token, { httpOnly: true, sameSite: 'none', secure: true });
-      res.redirect('http://localhost:3000');
+      res.redirect(process.env.OAUTH_REDIRECT_URL);
     });
   } catch (error) {
     console.log(error);
@@ -66,12 +66,12 @@ async function makeTokenForGoogleAuth(req, res) {
 // @ACCESS        Public
 async function loginWithGithub(req, res) {
   const githubClientId = process.env.GITHUB_CLIENT_ID;
-  const redirectURI = 'http://localhost:5000/api/auth/login/github/credential'
+  const redirectURI = 'http://epiclogs.herokuapp.com/api/auth/login/github/credential'
   res.redirect(`https://github.com/login/oauth/authorize?client_id=${githubClientId}&redirect_uri=${redirectURI}&scope=user`);
 }
 
 
-// @ROUTE         GET api/auth/login/github/credential
+// @ROUTE         GET api/auth/login/github-callback
 // @DESCRIPTION   Github auth redirection url
 // @ACCESS        Public
 async function makeTokenForGithubAuth(req, res) {
@@ -83,7 +83,7 @@ async function makeTokenForGithubAuth(req, res) {
     jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '12h' }, (err, token) => { // set expiresIn 12h for testing purpose.
       if (err) throw err;
       res.cookie('token', token, { httpOnly: true, sameSite: 'none', secure: true });
-      res.redirect('http://localhost:3000');
+      res.redirect(process.env.OAUTH_REDIRECT_URL);
     });
   } catch (error) {
     console.log(error);

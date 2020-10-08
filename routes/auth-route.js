@@ -39,7 +39,7 @@ router.get('/login/google-callback', googleAuthMiddleware, makeTokenForGoogleAut
 router.get('/login/github', loginWithGithub);
 
 
-// @ROUTE         GET api/auth/login/github/credential
+// @ROUTE         GET api/auth/login/github-callback
 // @DESCRIPTION   Github auth redirection url
 // @ACCESS        Public
 router.get('/login/github/credential', githubAuthMiddleware, makeTokenForGithubAuth);
