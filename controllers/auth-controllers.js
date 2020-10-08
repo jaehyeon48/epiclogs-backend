@@ -25,7 +25,7 @@ async function checkAuthController(req, res) {
 // @ACCESS        Public
 async function loginWithGithub(req, res) {
   const githubClientId = process.env.GITHUB_CLIENT_ID;
-  const redirectURI = 'http://epiclog.herokuapp.com/api/auth/login/github/credential'
+  const redirectURI = 'http://epiclogs.herokuapp.com/api/auth/login/github/credential'
   res.redirect(`https://github.com/login/oauth/authorize?client_id=${githubClientId}&redirect_uri=${redirectURI}&scope=user`);
 }
 
