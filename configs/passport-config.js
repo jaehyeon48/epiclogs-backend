@@ -23,7 +23,7 @@ passport.deserializeUser(async (userId, done) => {
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: 'http://localhost:5000/api/auth/login/google/credential'
+  callbackURL: 'https://epiclogs.herokuapp.com/api/auth/login/google/credential'
 }, async (accessToken, refreshToken, profile, done) => {
   // retrieve user data from 'profile' response
   const firstName = profile['_json']['given_name'];
