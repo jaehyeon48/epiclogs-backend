@@ -8,8 +8,7 @@ const {
 require('dotenv').config();
 
 async function googleAuthMiddleware(req, res, next) {
-  // const code = req.query.code;
-  const { code } = req.body;
+  const code = req.query.code;
   if (code) {
     try {
       const config = {
