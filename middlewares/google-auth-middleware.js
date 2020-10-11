@@ -33,6 +33,7 @@ async function googleAuthMiddleware(req, res, next) {
       else {
         const firstName = googleUserInfo['given_name'];
         const lastName = googleUserInfo['family_name'];
+        const name = `${firstName} ${lastName}`;
         const avatar = googleUserInfo.picture;
         let avatarFileName = null;
         if (avatar) {
@@ -44,8 +45,8 @@ async function googleAuthMiddleware(req, res, next) {
           uploadAvatarToS3(avatarFileName, Buffer.from(avatarImage.data, 'base64'));
         }
         const [newUserId] = await pool.query(`
-            INSERT INTO user(firstName, lastName, email, avatar, authType)
-            VALUES ('${firstName}', '${lastName}', '${email}', '${avatarFileName}', 'google');`);
+            INSERT INTO user(name, email, avatar, authType)
+            VALUES ('${name}', '${email}', '${avatarFileName}', 'google');`);
 
         req.googleUserId = newUserId.insertId;
         next();

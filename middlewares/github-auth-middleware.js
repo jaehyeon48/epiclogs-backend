@@ -49,7 +49,7 @@ async function githubAuthMiddileware(req, res, next) {
         uploadAvatarToS3(avatarFileName, Buffer.from(avatarImage.data, 'base64'));
       }
       const [newUserId] = await pool.query(`
-        INSERT INTO user(firstName, avatar, authType) VALUES('${username}', '${avatarFileName}','github')`);
+        INSERT INTO user(name, avatar, authType) VALUES('${username}', '${avatarFileName}','github')`);
 
       req.githubUserId = newUserId.insertId;
       next();

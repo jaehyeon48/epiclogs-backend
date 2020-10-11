@@ -11,7 +11,7 @@ require('dotenv').config();
 async function checkAuthController(req, res) {
   const userId = req.user.id;
   try {
-    const [userRow] = await pool.query(`SELECT userId, firstName, lastName, email, avatar, authType FROM user WHERE userId = ${userId}`);
+    const [userRow] = await pool.query(`SELECT userId, name, email, avatar, authType FROM user WHERE userId = ${userId}`);
 
     return res.status(200).json(userRow[0]);
   } catch (err) {
@@ -103,7 +103,7 @@ function logout(req, res) {
 // @DESCRIPTION   Register user in local
 // @ACCESS        Public
 async function signUp(req, res) {
-  const { firstName, lastName, email, password } = req.body;
+  const { name, email, password } = req.body;
 
   try {
     const checkExistUser = await pool.query(`SELECT userId FROM user WHERE email = '${email}' AND authType = 'local'`);
@@ -115,8 +115,8 @@ async function signUp(req, res) {
     const encryptedPassword = await bcrypt.hash(password, 10);
 
     const [newUser] = await pool.query(
-      `INSERT INTO user (firstName, lastName, email, password, authType)
-       VALUES ('${firstName}', '${lastName}' ,'${email}', '${encryptedPassword}', 'local')`);
+      `INSERT INTO user (name, email, password, authType)
+       VALUES ('${name}' ,'${email}', '${encryptedPassword}', 'local')`);
 
     const jwtPayload = {
       user: { id: newUser.insertId }
