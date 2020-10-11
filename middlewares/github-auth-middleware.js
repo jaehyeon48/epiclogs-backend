@@ -28,11 +28,7 @@ async function githubAuthMiddileware(req, res, next) {
     const username = gitHubUser.login;
     const avatar = gitHubUser['avatar_url'];
 
-    /* !!!!!!!!!!!!!!! NOTE !!!!!!!!!!!!!!!
-    * Just in case we don't get the email, we will not save user's email for github auth.
-    * Instead of using email, we will save username into firstName of DB
-    */
-    const [isUserExist] = await pool.query(`SELECT userId FROM user WHERE firstName = '${username}' AND authType = 'github'`);
+    const [isUserExist] = await pool.query(`SELECT userId FROM user WHERE name = '${username}' AND authType = 'github'`);
 
     if (isUserExist[0]) {
       req.githubUserId = isUserExist[0].userId;
