@@ -8,6 +8,7 @@ const {
   makeTokenForGithubAuth,
   logout,
   signUp,
+  checkNicknameDuplication,
   loginWithGoogle,
   makeTokenForGoogleAuth
 } = require('../controllers/auth-controllers');
@@ -31,7 +32,7 @@ router.get('/login/google', loginWithGoogle);
 // @ROUTE         GET api/auth/login/google-callback
 // @DESCRIPTION   Github auth redirection url
 // @ACCESS        Public
-router.get('/login/google-callback', googleAuthMiddleware, makeTokenForGoogleAuth);
+router.post('/login/google-callback', googleAuthMiddleware, makeTokenForGoogleAuth);
 
 // @ROUTE         GET api/auth/login/github
 // @DESCRIPTION   Login user with Github
@@ -55,6 +56,11 @@ router.get('/logout', authMiddleware, logout);
 // @ACCESS        Public
 router.post('/signup', signUp);
 
+
+// @ROUTE         POST api/auth/nickname-duplicate
+// @DESCRIPTION   Check if the nickname is duplicated or not
+// @ACCESS        Public
+router.post('/nickname-duplicate', checkNicknameDuplication);
 
 // @ROUTE         POST api/auth/login/local
 // @DESCRIPTION   Login user in local

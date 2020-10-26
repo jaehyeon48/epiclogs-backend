@@ -4,6 +4,14 @@ const bcrypt = require('bcryptjs');
 const { google } = require('googleapis');
 require('dotenv').config();
 
+/*
+  ***********************
+  error code meaning
+  -100: email error
+  -101: nickname error
+  ***********************
+ */
+
 
 // @ROUTE         GET api/auth/check
 // @DESCRIPTION   check authentication
@@ -11,7 +19,7 @@ require('dotenv').config();
 async function checkAuthController(req, res) {
   const userId = req.user.id;
   try {
-    const [userRow] = await pool.query(`SELECT userId, name, email, avatar, authType FROM user WHERE userId = ${userId}`);
+    const [userRow] = await pool.query(`SELECT userId, name, nickname, email, avatar, authType FROM user WHERE userId = ${userId}`);
 
     return res.status(200).json(userRow[0]);
   } catch (err) {
@@ -52,8 +60,8 @@ async function makeTokenForGoogleAuth(req, res) {
   try {
     jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '12h' }, (err, token) => { // set expiresIn 12h for testing purpose.
       if (err) throw err;
-      res.cookie('UAID', token, { httpOnly: true, sameSite: 'none', secure: true });
-      res.redirect(process.env.OAUTH_REDIRECT_URL);
+      res.cookie('UAID', token, { httpOnly: true });
+      res.json({ successMsg: 'User successfully logged in with google.' });
     });
   } catch (error) {
     console.log(error);
@@ -82,8 +90,8 @@ async function makeTokenForGithubAuth(req, res) {
   try {
     jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '12h' }, (err, token) => { // set expiresIn 12h for testing purpose.
       if (err) throw err;
-      res.cookie('UAID', token, { httpOnly: true, sameSite: 'none', secure: true });
-      res.redirect(process.env.OAUTH_REDIRECT_URL);
+      res.cookie('UAID', token, { httpOnly: true });
+      res.redirect('http://localhost:3000');
     });
   } catch (error) {
     console.log(error);
@@ -95,7 +103,7 @@ async function makeTokenForGithubAuth(req, res) {
 // @DESCRIPTION   Logout the user
 // @ACCESS        Private
 function logout(req, res) {
-  res.status(200).cookie('UAID', '', { httpOnly: true, sameSite: 'none', secure: true, maxAge: '-1' }).json({ successMsg: 'Successfully logged out' });
+  res.status(200).cookie('UAID', '', { httpOnly: true, maxAge: '-1' }).json({ successMsg: 'Successfully logged out' });
 }
 
 
@@ -103,20 +111,25 @@ function logout(req, res) {
 // @DESCRIPTION   Register user in local
 // @ACCESS        Public
 async function signUp(req, res) {
-  const { name, email, password } = req.body;
-
+  const { name, nickname, email, password } = req.body;
   try {
-    const checkExistUser = await pool.query(`SELECT userId FROM user WHERE email = '${email}' AND authType = 'local'`);
+    const [checkExistUser] = await pool.query(`SELECT userId FROM user WHERE email = ? AND authType = 'local'`, [email]);
 
-    if (checkExistUser[0].length !== 0) {
-      return res.status(400).json({ errorMsg: 'User already exists!' });
+    if (checkExistUser[0]) {
+      return res.status(400).json({ errorCode: -100, errorMsg: 'User already exists!' });
+    }
+
+    const [checkExistNickname] = await pool.query(`SELECT userId FROM user WHERE nickname = ?`, [nickname]);
+
+    if (checkExistNickname[0]) {
+      return res.status(400).json({ errorCode: -101, errorMsg: 'Nickname is duplicated!' });
     }
 
     const encryptedPassword = await bcrypt.hash(password, 10);
 
     const [newUser] = await pool.query(
-      `INSERT INTO user (name, email, password, authType)
-       VALUES ('${name}' ,'${email}', '${encryptedPassword}', 'local')`);
+      `INSERT INTO user (name, nickname, email, password, authType)
+       VALUES (?, ?, ?, '${encryptedPassword}', 'local')`, [name, nickname, email]);
 
     const jwtPayload = {
       user: { id: newUser.insertId }
@@ -125,7 +138,7 @@ async function signUp(req, res) {
     jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '12h' }, (err, token) => { // set expiresIn 12h for testing purpose.
       if (err) throw err;
 
-      res.status(201).cookie('UAID', token, { httpOnly: true, sameSite: 'none', secure: true }).json({ successMsg: 'User successfully created.' });
+      res.status(201).cookie('UAID', token, { httpOnly: true }).json({ successMsg: 'User successfully created.' });
     });
   } catch (error) {
     console.log(error);
@@ -134,6 +147,25 @@ async function signUp(req, res) {
 }
 
 
+// @ROUTE         POST api/auth/nickname-duplicate
+// @DESCRIPTION   Check if the nickname is duplicated or not
+// @ACCESS        Public
+async function checkNicknameDuplication(req, res) {
+  const { nickname } = req.body;
+  try {
+    const [checkExistNickname] = await pool.query(`SELECT userId FROM user WHERE nickname = ?`, [nickname]);
+    if (checkExistNickname[0]) {
+      return res.status(200).json({ code: -101 });
+    }
+
+    return res.status(200).json({ code: 0 });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ errorMsg: 'Internal Server Error' });
+  }
+}
+
 // @ROUTE         POST api/auth/login/local
 // @DESCRIPTION   Login user in local
 // @ACCESS        Public
@@ -141,9 +173,9 @@ async function loginLocal(req, res) {
   const { email, password } = req.body;
 
   try {
-    const [userRow] = await pool.query(`SELECT userId, password FROM user WHERE email = '${email}' AND authType = 'local'`);
+    const [userRow] = await pool.query(`SELECT userId, password FROM user WHERE email = ? AND authType = 'local'`, [email]);
 
-    if (userRow[0] === undefined) {
+    if (!userRow[0]) {
       return res.status(400).json({ errorMsg: 'Email or password is invalid.' });
     }
 
@@ -160,7 +192,7 @@ async function loginLocal(req, res) {
     jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '12h' }, (err, token) => { // set expiresIn 12h for testing purpose.
       if (err) throw err;
 
-      res.status(200).cookie('UAID', token, { httpOnly: true, sameSite: 'none', secure: true }).json({ successMsg: 'Login success.' });
+      res.cookie('UAID', token, { httpOnly: true }).json({ successMsg: 'Login success.' });
     });
   } catch (error) {
     console.log(error);
@@ -176,5 +208,6 @@ module.exports = {
   makeTokenForGithubAuth,
   logout,
   signUp,
+  checkNicknameDuplication,
   loginWithGoogle,
 };
