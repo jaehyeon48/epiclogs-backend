@@ -166,6 +166,26 @@ async function checkNicknameDuplication(req, res) {
   }
 }
 
+
+// @ROUTE         POST api/auth/email-duplicate
+// @DESCRIPTION   Check if the email is duplicated or not
+// @ACCESS        Public
+async function checkEmailDuplication(req, res) {
+  const { email } = req.body;
+  try {
+    const [checkExistEmail] = await pool.query(`SELECT userId FROM user WHERE email = ?`, [email]);
+    if (checkExistEmail[0]) {
+      return res.status(200).json({ code: -100 });
+    }
+
+    return res.status(200).json({ code: 0 });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ errorMsg: 'Internal Server Error' });
+  }
+}
+
 // @ROUTE         POST api/auth/login/local
 // @DESCRIPTION   Login user in local
 // @ACCESS        Public
@@ -209,5 +229,6 @@ module.exports = {
   logout,
   signUp,
   checkNicknameDuplication,
+  checkEmailDuplication,
   loginWithGoogle,
 };

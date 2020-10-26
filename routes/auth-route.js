@@ -9,6 +9,7 @@ const {
   logout,
   signUp,
   checkNicknameDuplication,
+  checkEmailDuplication,
   loginWithGoogle,
   makeTokenForGoogleAuth
 } = require('../controllers/auth-controllers');
@@ -61,6 +62,12 @@ router.post('/signup', signUp);
 // @DESCRIPTION   Check if the nickname is duplicated or not
 // @ACCESS        Public
 router.post('/nickname-duplicate', checkNicknameDuplication);
+
+
+// @ROUTE         POST api/auth/email-duplicate
+// @DESCRIPTION   Check if the email is duplicated or not
+// @ACCESS        Public
+router.post('/email-duplicate', checkEmailDuplication);
 
 // @ROUTE         POST api/auth/login/local
 // @DESCRIPTION   Login user in local
