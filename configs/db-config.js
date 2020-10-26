@@ -6,7 +6,8 @@ const db_config = {
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  waitForConnections: true
+  waitForConnections: true,
+  connectionLimit: 100
 };
 
 
