@@ -60,7 +60,7 @@ async function makeTokenForGoogleAuth(req, res) {
   try {
     jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '12h' }, (err, token) => { // set expiresIn 12h for testing purpose.
       if (err) throw err;
-      res.cookie('UAID', token, { httpOnly: true });
+      res.cookie('UAID', token, { httpOnly: true, sameSite: 'none', secure: true });
       res.json({ successMsg: 'User successfully logged in with google.' });
     });
   } catch (error) {
@@ -90,7 +90,7 @@ async function makeTokenForGithubAuth(req, res) {
   try {
     jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '12h' }, (err, token) => { // set expiresIn 12h for testing purpose.
       if (err) throw err;
-      res.cookie('UAID', token, { httpOnly: true });
+      res.cookie('UAID', token, { httpOnly: true, sameSite: 'none', secure: true });
       res.redirect('http://localhost:3000');
     });
   } catch (error) {
@@ -103,7 +103,7 @@ async function makeTokenForGithubAuth(req, res) {
 // @DESCRIPTION   Logout the user
 // @ACCESS        Private
 function logout(req, res) {
-  res.status(200).cookie('UAID', '', { httpOnly: true, maxAge: '-1' }).json({ successMsg: 'Successfully logged out' });
+  res.status(200).cookie('UAID', '', { httpOnly: true, sameSite: 'none', secure: true, maxAge: '-1' }).json({ successMsg: 'Successfully logged out' });
 }
 
 
@@ -138,7 +138,7 @@ async function signUp(req, res) {
     jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '12h' }, (err, token) => { // set expiresIn 12h for testing purpose.
       if (err) throw err;
 
-      res.status(201).cookie('UAID', token, { httpOnly: true }).json({ successMsg: 'User successfully created.' });
+      res.status(201).cookie('UAID', token, { httpOnly: true, sameSite: 'none', secure: true }).json({ successMsg: 'User successfully created.' });
     });
   } catch (error) {
     console.log(error);
@@ -212,7 +212,7 @@ async function loginLocal(req, res) {
     jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '12h' }, (err, token) => { // set expiresIn 12h for testing purpose.
       if (err) throw err;
 
-      res.cookie('UAID', token, { httpOnly: true }).json({ successMsg: 'Login success.' });
+      res.cookie('UAID', token, { httpOnly: true, sameSite: 'none', secure: true }).json({ successMsg: 'Login success.' });
     });
   } catch (error) {
     console.log(error);
