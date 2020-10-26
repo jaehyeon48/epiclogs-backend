@@ -7,7 +7,7 @@ require('./configs/db-config'); // connect to DB
 
 const app = express();
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: 'https://epiclogs.tk',
   methods: 'GET,POST,PUT,PATCH,DELETE',
   allowedHeaders: 'Content-Type,X-Requested-With',
   credentials: true,
