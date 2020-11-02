@@ -253,7 +253,16 @@ async function registerNickname(req, res) {
 
   try {
     await pool.query(`UPDATE user SET nickname = ? WHERE userId = ?`, [nickname, userId]);
-    return res.status(200).json({ successMsg: 'Nickname inserted' });
+
+    const jwtPayload = {
+      user: { id: userId }
+    };
+
+    jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '12h' }, (err, token) => { // set expiresIn 12h for testing purpose.
+      if (err) throw err;
+
+      res.cookie('UAID', token, { httpOnly: true, sameSite: 'none', secure: true }).json({ successMsg: 'Login success.' });
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ errorMsg: 'Internal Server Error' });
