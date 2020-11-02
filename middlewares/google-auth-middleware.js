@@ -1,6 +1,6 @@
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
+const CryptoJS = require('crypto-js');
 const pool = require('../configs/db-config');
 const { v4: uuidv4 } = require('uuid');
 const {
@@ -34,6 +34,7 @@ async function googleAuthMiddleware(req, res, next) {
       }
       // google user is exists in DB, but nickname is null
       else if (userInfo[0] && !userInfo[0].nickname) {
+        const encryptedNewUserId = CryptoJS.SHA3((userInfo[0].userId).toString(), { outputLength: 256 });
         const encryptedNewUserId = await bcrypt.hash((userInfo[0].userId).toString(), 10);
         return res.redirect(301, `https://epiclogs.tk/auth/n-name?u=${encryptedNewUserId}`);
       }
@@ -56,7 +57,7 @@ async function googleAuthMiddleware(req, res, next) {
             INSERT INTO user(name, email, avatar, authType)
             VALUES ('${name}', '${email}', '${avatarFileName}', 'google');`);
 
-        const encryptedNewUserId = await bcrypt.hash((newUserId.insertId).toString(), 10);
+        const encryptedNewUserId = CryptoJS.SHA3((newUserId.insertId).toString(), { outputLength: 256 });
         return res.redirect(301, `https://epiclogs.tk/auth/n-name?u=${encryptedNewUserId}`);
       }
     } catch (error) {
