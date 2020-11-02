@@ -1,5 +1,6 @@
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const pool = require('../configs/db-config');
 const { v4: uuidv4 } = require('uuid');
 const {
@@ -48,8 +49,10 @@ async function googleAuthMiddleware(req, res, next) {
             INSERT INTO user(name, email, avatar, authType)
             VALUES ('${name}', '${email}', '${avatarFileName}', 'google');`);
 
-        req.googleUserId = newUserId.insertId;
-        next();
+        // req.googleUserId = newUserId.insertId;
+        // next();
+        const encryptedNewUserId = await bcrypt.hash(newUserId.insertId, 10);
+        return res.redirect(301, `https://epiclogs.tk/auth/n-name?u=${encryptedNewUserId}`);
       }
     } catch (error) {
       console.log(error);

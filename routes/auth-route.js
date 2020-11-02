@@ -74,5 +74,4 @@ router.post('/email-duplicate', checkEmailDuplication);
 // @ACCESS        Public
 router.post('/login/local', loginLocal);
 
-
 module.exports = router;
