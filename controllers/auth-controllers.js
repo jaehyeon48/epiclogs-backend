@@ -253,7 +253,7 @@ async function registerNickname(req, res) {
 
   try {
     await pool.query(`UPDATE user SET nickname = ? WHERE userId = ?`, [nickname, userId]);
-    return res.status(200);
+    return res.status(200).json({ successMsg: 'Nickname inserted' });
   } catch (error) {
     console.log(error);
     res.status(500).json({ errorMsg: 'Internal Server Error' });
