@@ -34,7 +34,7 @@ async function googleAuthMiddleware(req, res, next) {
       }
       // google user is exists in DB, but nickname is null
       else if (userInfo[0] && !userInfo[0].nickname) {
-        const encryptedNewUserId = CryptoJS.SHA3((userInfo[0].userId).toString(), { outputLength: 256 });
+        const encryptedNewUserId = CryptoJS.AES.encrypt((userInfo[0].userId).toString(), 'a1mre43gsdfa9ger04gbq10fd9ae9bf9d');
         return res.redirect(301, `https://epiclogs.tk/auth/n-name?u=${encryptedNewUserId}`);
       }
       // google user doesn't exist at all
@@ -56,7 +56,7 @@ async function googleAuthMiddleware(req, res, next) {
             INSERT INTO user(name, email, avatar, authType)
             VALUES ('${name}', '${email}', '${avatarFileName}', 'google');`);
 
-        const encryptedNewUserId = CryptoJS.SHA3((newUserId.insertId).toString(), { outputLength: 256 });
+        const encryptedNewUserId = CryptoJS.AES.encrypt((newUserId.insertId).toString(), 'a1mre43gsdfa9ger04gbq10fd9ae9bf9d');
         return res.redirect(301, `https://epiclogs.tk/auth/n-name?u=${encryptedNewUserId}`);
       }
     } catch (error) {
