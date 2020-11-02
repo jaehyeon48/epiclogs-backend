@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const pool = require('../configs/db-config');
 const bcrypt = require('bcryptjs');
+const CryptoJS = require('crypto-js');
 const { google } = require('googleapis');
 require('dotenv').config();
 
@@ -186,6 +187,29 @@ async function checkEmailDuplication(req, res) {
   }
 }
 
+
+// @ROUTE         POST api/auth/check-google-user
+// @DESCRIPTION   Checking google user's existence
+// @ACCESS        Public
+async function checkGoogleUser() {
+  const { userId } = req.body;
+
+  const decryptedUserId = CryptoJS.AES.decrypt(userId, process.env.AES_SECRET);
+
+  try {
+    const [searchRes] = await pool.query(`SELECT userId FROM user
+    WHERE userId = ? AND authType = 'google'`, [decryptedUserId]);
+
+    if (!searchRes[0]) {
+      return res.json({ res: -1 });
+    }
+    return res.json({ res: 0 });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ errorMsg: 'Internal Server Error' });
+  }
+}
+
 // @ROUTE         POST api/auth/login/local
 // @DESCRIPTION   Login user in local
 // @ACCESS        Public
@@ -230,5 +254,6 @@ module.exports = {
   signUp,
   checkNicknameDuplication,
   checkEmailDuplication,
+  checkGoogleUser,
   loginWithGoogle,
 };

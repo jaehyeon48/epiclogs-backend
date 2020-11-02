@@ -10,6 +10,7 @@ const {
   signUp,
   checkNicknameDuplication,
   checkEmailDuplication,
+  checkGoogleUser,
   loginWithGoogle,
   makeTokenForGoogleAuth
 } = require('../controllers/auth-controllers');
@@ -34,6 +35,12 @@ router.get('/login/google', loginWithGoogle);
 // @DESCRIPTION   Google auth redirection url
 // @ACCESS        Public
 router.get('/login/google-callback', googleAuthMiddleware, makeTokenForGoogleAuth);
+
+
+// @ROUTE         POST api/auth/check-google-user
+// @DESCRIPTION   Checking google user's existence
+// @ACCESS        Public
+router.post('/check-google-user', checkGoogleUser);
 
 // @ROUTE         GET api/auth/login/github
 // @DESCRIPTION   Login user with Github
