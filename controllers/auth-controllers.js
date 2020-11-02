@@ -203,6 +203,10 @@ async function checkGoogleUser(req, res) {
     const [searchRes] = await pool.query(`SELECT userId FROM user
     WHERE userId = ? AND authType = 'google'`, [decryptedUserId]);
 
+    console.log('-------------------------');
+    console.log(searchRes[0])
+    console.log('-------------------------');
+
     if (!searchRes[0]) {
       return res.json({ res: -1 });
     }
