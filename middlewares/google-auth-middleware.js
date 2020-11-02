@@ -51,6 +51,7 @@ async function googleAuthMiddleware(req, res, next) {
 
         // req.googleUserId = newUserId.insertId;
         // next();
+        console.log(newUserId.insertId);
         const encryptedNewUserId = await bcrypt.hash(newUserId.insertId, 10);
         return res.redirect(301, `https://epiclogs.tk/auth/n-name?u=${encryptedNewUserId}`);
       }
