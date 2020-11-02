@@ -188,17 +188,16 @@ async function checkEmailDuplication(req, res) {
 }
 
 
-// @ROUTE         POST api/auth/check-google-user
-// @DESCRIPTION   Checking google user's existence
+// @ROUTE         POST api/auth/check-oauth-user
+// @DESCRIPTION   Checking oauth user's existence
 // @ACCESS        Public
-async function checkGoogleUser(req, res) {
+async function checkOauthUser(req, res) {
   const { userId } = req.body;
 
   const decryptedUserId = CryptoJS.AES.decrypt(userId, process.env.AES_SECRET).toString(CryptoJS.enc.Utf8);
 
   try {
-    const [searchRes] = await pool.query(`SELECT userId FROM user
-    WHERE userId = ? AND authType = 'google'`, [decryptedUserId]);
+    const [searchRes] = await pool.query(`SELECT userId FROM user WHERE userId = ?`, [decryptedUserId]);
 
     if (!searchRes[0]) {
       return res.json({ res: -1 });
@@ -285,7 +284,7 @@ module.exports = {
   signUp,
   checkNicknameDuplication,
   checkEmailDuplication,
-  checkGoogleUser,
+  checkOauthUser,
   loginWithGoogle,
   registerNickname
 };

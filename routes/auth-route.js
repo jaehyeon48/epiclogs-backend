@@ -10,10 +10,11 @@ const {
   signUp,
   checkNicknameDuplication,
   checkEmailDuplication,
-  checkGoogleUser,
+  checkOauthUser,
   loginWithGoogle,
   makeTokenForGoogleAuth,
-  registerNickname
+  registerNickname,
+  checkOauthUser
 } = require('../controllers/auth-controllers');
 
 const authMiddleware = require('../middlewares/auth-middleware');
@@ -37,11 +38,6 @@ router.get('/login/google', loginWithGoogle);
 // @ACCESS        Public
 router.get('/login/google-callback', googleAuthMiddleware, makeTokenForGoogleAuth);
 
-
-// @ROUTE         POST api/auth/check-google-user
-// @DESCRIPTION   Checking google user's existence
-// @ACCESS        Public
-router.post('/check-google-user', checkGoogleUser);
 
 // @ROUTE         GET api/auth/login/github
 // @DESCRIPTION   Login user with Github
@@ -76,6 +72,13 @@ router.post('/nickname-duplicate', checkNicknameDuplication);
 // @DESCRIPTION   Check if the email is duplicated or not
 // @ACCESS        Public
 router.post('/email-duplicate', checkEmailDuplication);
+
+
+// @ROUTE         POST api/auth/check-google-user
+// @DESCRIPTION   Checking google user's existence
+// @ACCESS        Public
+router.post('/check-oauth-user', checkOauthUser);
+
 
 // @ROUTE         POST api/auth/login/local
 // @DESCRIPTION   Login user in local
