@@ -92,7 +92,7 @@ async function makeTokenForGithubAuth(req, res) {
     jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '12h' }, (err, token) => { // set expiresIn 12h for testing purpose.
       if (err) throw err;
       res.cookie('UAID', token, { httpOnly: true, sameSite: 'none', secure: true });
-      res.redirect('http://localhost:3000');
+      res.redirect('https://epiclogs.tk');
     });
   } catch (error) {
     console.log(error);
