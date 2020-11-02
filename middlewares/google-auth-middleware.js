@@ -24,13 +24,20 @@ async function googleAuthMiddleware(req, res, next) {
       const email = googleUserInfo.email;
 
 
-      // check if the google user is exists in the DB
-      const [isUserExist] = await pool.query(`SELECT userId FROM user WHERE email = '${email}' AND authType = 'google'`);
+      // check whether the google user is exists in the DB
+      // and check if the user is exists but his/her nickname is null
+      const [userInfo] = await pool.query(`SELECT userId, nickname FROM user WHERE email = '${email}' AND authType = 'google'`);
 
-      if (isUserExist[0]) { // if the user exist, sign in the user
-        req.googleUserId = isUserExist[0].userId;
+      if (userInfo[0] && userInfo[0].nickname) { // if the user exist, sign in the user
+        req.googleUserId = userInfo[0].userId;
         next();
       }
+      // google user is exists in DB, but nickname is null
+      else if (userInfo[0] && !userInfo[0].nickname) {
+        const encryptedNewUserId = await bcrypt.hash((userInfo[0].userId).toString(), 10);
+        return res.redirect(301, `http://localhost:3000/auth/n-name?u=${encryptedNewUserId}`);
+      }
+      // google user doesn't exist at all
       else {
         const firstName = googleUserInfo['given_name'];
         const lastName = googleUserInfo['family_name'];
@@ -49,10 +56,8 @@ async function googleAuthMiddleware(req, res, next) {
             INSERT INTO user(name, email, avatar, authType)
             VALUES ('${name}', '${email}', '${avatarFileName}', 'google');`);
 
-        // req.googleUserId = newUserId.insertId;
-        // next();
-        const encryptedNewUserId = await bcrypt.hash(parseInt(newUserId.insertId), 10);
-        return res.redirect(301, `https://epiclogs.tk/auth/n-name?u=${encryptedNewUserId}`);
+        const encryptedNewUserId = await bcrypt.hash((newUserId.insertId).toString(), 10);
+        return res.redirect(301, `http://localhost:3000/auth/n-name?u=${encryptedNewUserId}`);
       }
     } catch (error) {
       console.log(error);
