@@ -35,7 +35,6 @@ async function googleAuthMiddleware(req, res, next) {
       // google user is exists in DB, but nickname is null
       else if (userInfo[0] && !userInfo[0].nickname) {
         const encryptedNewUserId = CryptoJS.SHA3((userInfo[0].userId).toString(), { outputLength: 256 });
-        const encryptedNewUserId = await bcrypt.hash((userInfo[0].userId).toString(), 10);
         return res.redirect(301, `https://epiclogs.tk/auth/n-name?u=${encryptedNewUserId}`);
       }
       // google user doesn't exist at all
