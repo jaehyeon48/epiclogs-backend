@@ -194,7 +194,7 @@ async function checkEmailDuplication(req, res) {
 async function checkGoogleUser(req, res) {
   const { userId } = req.body;
 
-  const decryptedUserId = CryptoJS.AES.decrypt(userId, process.env.AES_SECRET);
+  const decryptedUserId = CryptoJS.AES.decrypt(userId, process.env.AES_SECRET).toString(CryptoJS.enc.Utf8);
 
   console.log(decryptedUserId)
   try {
