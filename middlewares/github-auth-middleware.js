@@ -1,5 +1,6 @@
 const axios = require('axios');
 const { v4: uuidv4 } = require('uuid');
+const CryptoJS = require('crypto-js');
 const pool = require('../configs/db-config');
 
 const {
@@ -28,11 +29,16 @@ async function githubAuthMiddileware(req, res, next) {
     const username = gitHubUser.login;
     const avatar = gitHubUser['avatar_url'];
 
-    const [isUserExist] = await pool.query(`SELECT userId FROM user WHERE name = '${username}' AND authType = 'github'`);
+    const [userInfo] = await pool.query(`SELECT userId, nickname FROM user WHERE name = '${username}' AND authType = 'github'`);
 
-    if (isUserExist[0]) {
-      req.githubUserId = isUserExist[0].userId;
+    if (userInfo[0] && userInfo[0].nickname) { // if the user exist, sign in the user
+      req.githubUserId = userInfo[0].userId;
       next();
+    }
+    // github user is exists in DB, but nickname is null
+    else if (userInfo[0] && !userInfo[0].nickname) {
+      const encryptedNewUserId = CryptoJS.AES.encrypt((userInfo[0].userId).toString(), process.env.AES_SECRET);
+      return res.redirect(301, `https://epiclogs.tk/auth/n-name?u=${encryptedNewUserId}`);
     }
     else {
       let avatarFileName = null;
@@ -47,8 +53,8 @@ async function githubAuthMiddileware(req, res, next) {
       const [newUserId] = await pool.query(`
         INSERT INTO user(name, avatar, authType) VALUES('${username}', '${avatarFileName}','github')`);
 
-      req.githubUserId = newUserId.insertId;
-      next();
+      const encryptedNewUserId = CryptoJS.AES.encrypt((newUserId.insertId).toString(), process.env.AES_SECRET);
+      return res.redirect(301, `https://epiclogs.tk/auth/n-name?u=${encryptedNewUserId}`);
     }
   } catch (error) {
     console.log(error);
