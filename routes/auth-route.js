@@ -10,7 +10,6 @@ const {
   signUp,
   checkNicknameDuplication,
   checkEmailDuplication,
-  checkOauthUser,
   loginWithGoogle,
   makeTokenForGoogleAuth,
   registerNickname,
