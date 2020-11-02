@@ -12,7 +12,8 @@ const {
   checkEmailDuplication,
   checkGoogleUser,
   loginWithGoogle,
-  makeTokenForGoogleAuth
+  makeTokenForGoogleAuth,
+  registerNickname
 } = require('../controllers/auth-controllers');
 
 const authMiddleware = require('../middlewares/auth-middleware');
@@ -80,5 +81,11 @@ router.post('/email-duplicate', checkEmailDuplication);
 // @DESCRIPTION   Login user in local
 // @ACCESS        Public
 router.post('/login/local', loginLocal);
+
+
+// @ROUTE         POST api/auth/register-nickname
+// @DESCRIPTION   Add nickname to oauth user
+// @ACCESS        Public
+router.post('/register-nickname', registerNickname);
 
 module.exports = router;

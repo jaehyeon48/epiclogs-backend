@@ -244,6 +244,22 @@ async function loginLocal(req, res) {
   }
 }
 
+
+// @ROUTE         POST api/auth/register-nickname
+// @DESCRIPTION   Add nickname to oauth user
+// @ACCESS        Public
+async function registerNickname(req, res) {
+  const { userId, nickname } = req.body;
+
+  try {
+    await pool.query(`UPDATE user SET nickname = ? WHERE userId = ?`, [nickname, userId]);
+    return res.status(200);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ errorMsg: 'Internal Server Error' });
+  }
+}
+
 module.exports = {
   checkAuthController,
   loginLocal,
@@ -256,4 +272,5 @@ module.exports = {
   checkEmailDuplication,
   checkGoogleUser,
   loginWithGoogle,
+  registerNickname
 };
