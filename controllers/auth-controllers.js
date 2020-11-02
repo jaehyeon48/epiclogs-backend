@@ -252,6 +252,12 @@ async function registerNickname(req, res) {
   const { userId, nickname } = req.body;
 
   try {
+    const [checkExistNickname] = await pool.query(`SELECT userId FROM user WHERE nickname = ?`, [nickname]);
+
+    if (checkExistNickname[0]) {
+      return res.status(400).json({ errorCode: -101, errorMsg: 'Nickname is duplicated!' });
+    }
+
     await pool.query(`UPDATE user SET nickname = ? WHERE userId = ?`, [nickname, userId]);
 
     const jwtPayload = {
