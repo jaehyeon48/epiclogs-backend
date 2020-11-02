@@ -195,17 +195,10 @@ async function checkGoogleUser(req, res) {
   const { userId } = req.body;
 
   const decryptedUserId = CryptoJS.AES.decrypt(userId, process.env.AES_SECRET).toString(CryptoJS.enc.Utf8);
-  console.log('-------------------------');
-  console.log(decryptedUserId)
-  console.log('-------------------------');
 
   try {
     const [searchRes] = await pool.query(`SELECT userId FROM user
     WHERE userId = ? AND authType = 'google'`, [decryptedUserId]);
-
-    console.log('-------------------------');
-    console.log(searchRes[0])
-    console.log('-------------------------');
 
     if (!searchRes[0]) {
       return res.json({ res: -1 });
