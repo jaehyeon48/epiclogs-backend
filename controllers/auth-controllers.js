@@ -191,7 +191,7 @@ async function checkEmailDuplication(req, res) {
 // @ROUTE         POST api/auth/check-google-user
 // @DESCRIPTION   Checking google user's existence
 // @ACCESS        Public
-async function checkGoogleUser() {
+async function checkGoogleUser(req, res) {
   const { userId } = req.body;
 
   const decryptedUserId = CryptoJS.AES.decrypt(userId, process.env.AES_SECRET);
