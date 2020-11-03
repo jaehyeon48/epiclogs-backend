@@ -277,44 +277,6 @@ async function registerNickname(req, res) {
 }
 
 
-// @ROUTE         POST api/auth/avatar
-// @DESCRIPTION   Upload user's avatar
-// @ACCESS        Private
-async function uploadUserAvatar(req, res) {
-  const userId = req.user.id;
-  const { imageName } = req.body;
-
-  try {
-    const [prevAvatar] = await pool.query(`SELECT avatar FROM user WHERE userId = ?`, [userId]);
-
-    if (prevAvatar[0]) {
-      deleteAvatarFromS3(prevAvatar[0].avatar);
-    }
-
-    await pool.query(`UPDATE user SET avatar = ? WHERE userId = ?`, [imageName, userId]);
-
-    return res.json({ successMsg: 'Upload avatar successfully.' });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ errorMsg: 'Internal Server Error' });
-  }
-}
-
-async function deleteUserAvatar(req, res) {
-  const userId = req.user.id;
-  try {
-    const [prevAvatar] = await pool.query(`SELECT avatar FROM user WHERE userId = ?`, [userId]);
-
-    if (prevAvatar[0]) {
-      deleteAvatarFromS3(prevAvatar[0].avatar);
-      await pool.query(`UPDATE user SET avatar = '' WHERE userId = ?`, [userId]);
-    }
-    return res.json({ successMsg: 'Avatar deleted successfully.' });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ errorMsg: 'Internal Server Error' });
-  }
-}
 
 module.exports = {
   checkAuthController,
@@ -328,7 +290,5 @@ module.exports = {
   checkEmailDuplication,
   checkOauthUser,
   loginWithGoogle,
-  registerNickname,
-  uploadUserAvatar,
-  deleteUserAvatar
+  registerNickname
 };

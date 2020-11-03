@@ -57,12 +57,6 @@ router.get('/login/github-callback', githubAuthMiddleware, makeTokenForGithubAut
 router.get('/logout', authMiddleware, logout);
 
 
-// @ROUTE         GET api/auth/delete-avatar
-// @DESCRIPTION   Delete user's avatar
-// @ACCESS        Private
-router.get('/delete-avatar', authMiddleware, deleteUserAvatar);
-
-
 // @ROUTE         POST api/auth/signup
 // @DESCRIPTION   Register user in local
 // @ACCESS        Public
@@ -97,11 +91,5 @@ router.post('/login/local', loginLocal);
 // @DESCRIPTION   Add nickname to oauth user
 // @ACCESS        Public
 router.post('/register-nickname', registerNickname);
-
-
-// @ROUTE         POST api/auth/avatar
-// @DESCRIPTION   Upload user's avatar
-// @ACCESS        Private
-router.post('/avatar', authMiddleware, uploadUserAvatar);
 
 module.exports = router;
