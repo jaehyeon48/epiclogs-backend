@@ -14,7 +14,8 @@ const {
   makeTokenForGoogleAuth,
   registerNickname,
   checkOauthUser,
-  uploadUserAvatar
+  uploadUserAvatar,
+  deleteUserAvatar
 } = require('../controllers/auth-controllers');
 
 const authMiddleware = require('../middlewares/auth-middleware');
@@ -54,6 +55,12 @@ router.get('/login/github-callback', githubAuthMiddleware, makeTokenForGithubAut
 // @DESCRIPTION   Logout the user
 // @ACCESS        Private
 router.get('/logout', authMiddleware, logout);
+
+
+// @ROUTE         GET api/auth/delete-avatar
+// @DESCRIPTION   Delete user's avatar
+// @ACCESS        Private
+router.get('/delete-avatar', authMiddleware, deleteUserAvatar);
 
 
 // @ROUTE         POST api/auth/signup

@@ -300,6 +300,22 @@ async function uploadUserAvatar(req, res) {
   }
 }
 
+async function deleteUserAvatar(req, res) {
+  const userId = req.user.id;
+  try {
+    const [prevAvatar] = await pool.query(`SELECT avatar FROM user WHERE userId = ?`, [userId]);
+
+    if (prevAvatar[0]) {
+      deleteAvatarFromS3(prevAvatar[0].avatar);
+      await pool.query(`UPDATE user SET avatar = '' WHERE userId = ?`, [userId]);
+    }
+    return res.json({ successMsg: 'Avatar deleted successfully.' });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ errorMsg: 'Internal Server Error' });
+  }
+}
+
 module.exports = {
   checkAuthController,
   loginLocal,
@@ -313,5 +329,6 @@ module.exports = {
   checkOauthUser,
   loginWithGoogle,
   registerNickname,
-  uploadUserAvatar
+  uploadUserAvatar,
+  deleteUserAvatar
 };
