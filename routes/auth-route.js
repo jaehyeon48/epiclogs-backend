@@ -13,7 +13,8 @@ const {
   loginWithGoogle,
   makeTokenForGoogleAuth,
   registerNickname,
-  checkOauthUser
+  checkOauthUser,
+  uploadUserAvatar
 } = require('../controllers/auth-controllers');
 
 const authMiddleware = require('../middlewares/auth-middleware');
@@ -89,5 +90,11 @@ router.post('/login/local', loginLocal);
 // @DESCRIPTION   Add nickname to oauth user
 // @ACCESS        Public
 router.post('/register-nickname', registerNickname);
+
+
+// @ROUTE         POST api/auth/avatar
+// @DESCRIPTION   Upload user's avatar
+// @ACCESS        Private
+router.post('/avatar', authMiddleware, uploadUserAvatar);
 
 module.exports = router;

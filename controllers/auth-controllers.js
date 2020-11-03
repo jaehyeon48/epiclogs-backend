@@ -3,6 +3,8 @@ const pool = require('../configs/db-config');
 const bcrypt = require('bcryptjs');
 const CryptoJS = require('crypto-js');
 const { google } = require('googleapis');
+
+const { deleteAvatarFromS3 } = require('../utils/aws-s3');
 require('dotenv').config();
 
 /*
@@ -274,6 +276,30 @@ async function registerNickname(req, res) {
   }
 }
 
+
+// @ROUTE         POST api/auth/avatar
+// @DESCRIPTION   Upload user's avatar
+// @ACCESS        Private
+async function uploadUserAvatar(req, res) {
+  const userId = req.user.id;
+  const { imageName } = req.body;
+
+  try {
+    const [prevAvatar] = await pool.query(`SELECT avatar FROM user WHERE userId = ?`, [userId]);
+
+    if (prevAvatar[0]) {
+      deleteAvatarFromS3(prevAvatar[0].avatar);
+    }
+
+    await pool.query(`UPDATE user SET avatar = ? WHERE userId = ?`, [imageName, userId]);
+
+    return res.json({ successMsg: 'Upload avatar successfully.' });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ errorMsg: 'Internal Server Error' });
+  }
+}
+
 module.exports = {
   checkAuthController,
   loginLocal,
@@ -286,5 +312,6 @@ module.exports = {
   checkEmailDuplication,
   checkOauthUser,
   loginWithGoogle,
-  registerNickname
+  registerNickname,
+  uploadUserAvatar
 };
