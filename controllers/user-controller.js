@@ -1,5 +1,10 @@
 const pool = require('../configs/db-config');
 
+const {
+  uploadAvatarToS3,
+  deleteAvatarFromS3
+} = require('../utils/aws-s3');
+
 async function modifyUsername(req, res) {
   const userId = req.user.id;
   const { newUsername } = req.body;
