@@ -5,6 +5,10 @@ const {
   deleteAvatarFromS3
 } = require('../utils/aws-s3');
 
+
+// @ROUTE         PUT api/user/username
+// @DESCRIPTION   Modify username
+// @ACCESS        Private
 async function modifyUsername(req, res) {
   const userId = req.user.id;
   const { newUsername } = req.body;
@@ -13,6 +17,24 @@ async function modifyUsername(req, res) {
     await pool.query(`UPDATE user SET name = ? WHERE userId = ?`, [newUsername, userId]);
 
     return res.json({ successMsg: 'Modified username successfully' });
+  } catch (error) {
+    console.error(err);
+    return res.status(500).json({ errorMsg: 'Internal Server Error' });
+  }
+}
+
+
+// @ROUTE         PUT api/user/nickname
+// @DESCRIPTION   Modify nickname
+// @ACCESS        Private
+async function modifyNickname(req, res) {
+  const userId = req.user.id;
+  const { newNickname } = req.body;
+
+  try {
+    await pool.query(`UPDATE user SET nickname = ? WHERE userId = ?`, [newNickname, userId]);
+
+    return res.json({ successMsg: 'Successfully modified nickname' });
   } catch (error) {
     console.error(err);
     return res.status(500).json({ errorMsg: 'Internal Server Error' });
@@ -64,6 +86,7 @@ async function deleteUserAvatar(req, res) {
 
 module.exports = {
   modifyUsername,
+  modifyNickname,
   uploadUserAvatar,
   deleteUserAvatar
 };
