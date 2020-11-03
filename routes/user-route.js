@@ -4,6 +4,7 @@ const router = express.Router();
 const {
   modifyUsername,
   modifyNickname,
+  modifyPassword,
   uploadUserAvatar,
   deleteUserAvatar
 } = require('../controllers/user-controller');
@@ -20,6 +21,13 @@ router.put('/username', authMiddleware, modifyUsername);
 // @DESCRIPTION   Modify nickname
 // @ACCESS        Private
 router.put('/nickname', authMiddleware, modifyNickname);
+
+
+// @ROUTE         PUT api/user/password
+// @DESCRIPTION   Modify password
+// @ACCESS        Private
+router.put('/password', authMiddleware, modifyPassword);
+
 
 // @ROUTE         POST api/user/avatar
 // @DESCRIPTION   Upload user's avatar

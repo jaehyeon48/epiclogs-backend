@@ -1,4 +1,5 @@
 const pool = require('../configs/db-config');
+const bcrypt = require('bcryptjs');
 
 const {
   uploadAvatarToS3,
@@ -40,6 +41,26 @@ async function modifyNickname(req, res) {
     return res.status(500).json({ errorMsg: 'Internal Server Error' });
   }
 }
+
+
+// @ROUTE         PUT api/user/password
+// @DESCRIPTION   Modify password
+// @ACCESS        Private
+async function modifyPassword(req, res) {
+  const userId = req.user.id;
+  const { newPassword } = req.body;
+
+  try {
+    const hashedPw = await bcrypt.hash(newPassword, 10);
+    await pool.query(`UPDATE user SET password = ? WHERE userId = ?`, [hashedPw, userId]);
+
+    return res.json({ successMsg: 'Successfully modified password' });
+  } catch (error) {
+    console.error(err);
+    return res.status(500).json({ errorMsg: 'Internal Server Error' });
+  }
+}
+
 
 // @ROUTE         POST api/user/avatar
 // @DESCRIPTION   Upload user's avatar
@@ -87,6 +108,7 @@ async function deleteUserAvatar(req, res) {
 module.exports = {
   modifyUsername,
   modifyNickname,
+  modifyPassword,
   uploadUserAvatar,
   deleteUserAvatar
 };
