@@ -1,5 +1,30 @@
 const pool = require('../configs/db-config');
 
+// @ROUTE         GET api/post/all
+// @DESCRIPTION   Get all public posts
+// @ACCESS        Public
+async function getAllPublicPosts(req, res) {
+  const postResult = [];
+  try {
+    const [posts] = await pool.query(`SELECT postId, nickname, avatar, title, body, post.createdAt
+    FROM post INNER JOIN user ON post.userId = user.userId WHERE post.privacy = 'public'`);
+    for (const [i, post] of posts.entries()) {
+      postResult.push(post);
+      postResult[i].tags = [];
+      const [postTags] = await pool.query(`SELECT tagName FROM tag INNER JOIN postTag
+        ON postId = ? AND postTag.tagId = tag.tagId`, [post.postId]);
+
+      postTags.forEach((tag) => {
+        postResult[i].tags.push(tag.tagName);
+      });
+    }
+    return res.json(postResult);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ errorMsg: 'Internal Server Error' });
+  }
+}
+
 // @ROUTE         POST api/post/add
 // @DESCRIPTION   add a new post
 // @ACCESS        Private
@@ -43,5 +68,6 @@ async function addPost(req, res) {
 }
 
 module.exports = {
+  getAllPublicPosts,
   addPost
 };
