@@ -56,6 +56,24 @@ async function getPost(req, res) {
 }
 
 
+// @ROUTE         GET api/post/tags/:postId
+// @DESCRIPTION   Get tags of a post
+// @ACCESS        Public
+async function getTags(req, res) {
+  const postId = req.params.postId;
+
+  try {
+    const [tags] = await pool.query(`SELECT tagName FROM tag INNER JOIN postTag ON postId = ?
+      AND postTag.tagId = tag.tagId`, [postId]);
+
+    return res.json({ tags });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ errorMsg: 'Internal Server Error' });
+  }
+}
+
+
 // @ROUTE         POST api/post/add
 // @DESCRIPTION   add a new post
 // @ACCESS        Private
@@ -102,5 +120,6 @@ async function addPost(req, res) {
 module.exports = {
   getAllPublicPosts,
   getPost,
+  getTags,
   addPost
 };

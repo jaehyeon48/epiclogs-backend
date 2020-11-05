@@ -5,6 +5,7 @@ const pool = require('../configs/db-config');
 const {
   getAllPublicPosts,
   getPost,
+  getTags,
   addPost
 } = require('../controllers/post-controller');
 
@@ -20,6 +21,13 @@ router.get('/all/:startRange', getAllPublicPosts);
 // @DESCRIPTION   get a post
 // @ACCESS        Public
 router.get('/:postId', getPost);
+
+
+// @ROUTE         GET api/post/tags/:postId
+// @DESCRIPTION   Get tags of a post
+// @ACCESS        Public
+router.get('/tags/:postId', getTags);
+
 
 // @ROUTE         POST api/post/add
 // @DESCRIPTION   add a new post
