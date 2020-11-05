@@ -7,6 +7,21 @@ const {
 } = require('../utils/aws-s3');
 
 
+// @ROUTE         GET api/user/avatar/:nickname
+// @DESCRIPTION   Get a user's avatar
+// @ACCESS        Public
+async function getAvatar(req, res) {
+  const nickname = req.params.nickname;
+
+  try {
+    const [avatar] = await pool.query(`SELECT avatar FROM user WHERE nickname = ?`, [nickname]);
+    return res.json({ avatar: avatar[0].avatar });
+  } catch (error) {
+    console.error(err);
+    return res.status(500).json({ errorMsg: 'Internal Server Error' });
+  }
+}
+
 // @ROUTE         PUT api/user/username
 // @DESCRIPTION   Modify username
 // @ACCESS        Private
@@ -106,6 +121,7 @@ async function deleteUserAvatar(req, res) {
 }
 
 module.exports = {
+  getAvatar,
   modifyUsername,
   modifyNickname,
   modifyPassword,

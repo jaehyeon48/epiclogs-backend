@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const {
+  getAvatar,
   modifyUsername,
   modifyNickname,
   modifyPassword,
@@ -10,6 +11,12 @@ const {
 } = require('../controllers/user-controller');
 
 const authMiddleware = require('../middlewares/auth-middleware');
+
+// @ROUTE         GET api/user/avatar/:nickname
+// @DESCRIPTION   Get a user's avatar
+// @ACCESS        Public
+router.get('/avatar/:nickname', getAvatar);
+
 
 // @ROUTE         PUT api/user/username
 // @DESCRIPTION   Modify username
