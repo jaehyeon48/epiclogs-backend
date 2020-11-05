@@ -132,6 +132,9 @@ async function signUp(req, res) {
     const encryptedPassword = await bcrypt.hash(password, 10);
 
     const creationTime = getCurrentISOTime();
+    console.log('================');
+    console.log(creationTime);
+    console.log('================');
     const [newUser] = await pool.query(
       `INSERT INTO user (name, nickname, email, password, authType, createdAt)
        VALUES (?, ?, ?, ?, 'local', ?)`, [name, nickname, email, encryptedPassword, creationTime]);
