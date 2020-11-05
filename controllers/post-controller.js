@@ -37,6 +37,25 @@ async function getAllPublicPosts(req, res) {
   }
 }
 
+
+// @ROUTE         GET api/post/:postId
+// @DESCRIPTION   get a post
+// @ACCESS        Public
+async function getPost(req, res) {
+  const postId = req.params.postId;
+
+  try {
+    const [post] = await pool.query(`SELECT title, body, createdAt FROM post
+    WHERE postId = ?`, [postId]);
+
+    return res.json(post[0]);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ errorMsg: 'Internal Server Error' });
+  }
+}
+
+
 // @ROUTE         POST api/post/add
 // @DESCRIPTION   add a new post
 // @ACCESS        Private
@@ -79,7 +98,9 @@ async function addPost(req, res) {
   }
 }
 
+
 module.exports = {
   getAllPublicPosts,
+  getPost,
   addPost
 };
