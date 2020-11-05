@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const CryptoJS = require('crypto-js');
 const pool = require('../configs/db-config');
 const { v4: uuidv4 } = require('uuid');
+const getCurrentISOTime = require('../utils/getCurrentTime');
 const {
   uploadAvatarToS3
 } = require('../utils/aws-s3');
@@ -52,9 +53,10 @@ async function googleAuthMiddleware(req, res, next) {
           avatarFileName = `${uuidv4()}.${avatarExtension}`;
           uploadAvatarToS3(avatarFileName, Buffer.from(avatarImage.data, 'base64'));
         }
+        const creationTime = getCurrentISOTime();
         const [newUserId] = await pool.query(`
-            INSERT INTO user(name, email, avatar, authType)
-            VALUES ('${name}', '${email}', '${avatarFileName}', 'google');`);
+            INSERT INTO user(name, email, avatar, authType, createdAt)
+            VALUES (?, ?, ?, 'google', ?)`, [name, email, avatarFileName, creationTime]);
 
         const encryptedNewUserId = CryptoJS.AES.encrypt((newUserId.insertId).toString(), process.env.AES_SECRET);
         return res.redirect(301, `https://epiclogs.tk/auth/n-name?u=${encryptedNewUserId}`);

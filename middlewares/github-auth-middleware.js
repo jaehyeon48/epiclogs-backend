@@ -2,6 +2,7 @@ const axios = require('axios');
 const { v4: uuidv4 } = require('uuid');
 const CryptoJS = require('crypto-js');
 const pool = require('../configs/db-config');
+const getCurrentISOTime = require('../utils/getCurrentTime');
 
 const {
   uploadAvatarToS3
@@ -50,8 +51,9 @@ async function githubAuthMiddileware(req, res, next) {
         avatarFileName = `${uuidv4()}.png`;
         uploadAvatarToS3(avatarFileName, Buffer.from(avatarImage.data, 'base64'));
       }
+      const creationTime = getCurrentISOTime();
       const [newUserId] = await pool.query(`
-        INSERT INTO user(name, avatar, authType) VALUES('${username}', '${avatarFileName}','github')`);
+        INSERT INTO user(name, avatar, authType, createdAt) VALUES(?, ?,'github', ?)`, [username, avatarFileName, creationTime]);
 
       const encryptedNewUserId = CryptoJS.AES.encrypt((newUserId.insertId).toString(), process.env.AES_SECRET);
       return res.redirect(301, `https://epiclogs.tk/auth/n-name?u=${encryptedNewUserId}`);

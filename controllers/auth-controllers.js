@@ -3,6 +3,7 @@ const pool = require('../configs/db-config');
 const bcrypt = require('bcryptjs');
 const CryptoJS = require('crypto-js');
 const { google } = require('googleapis');
+const getCurrentISOTime = require('../utils/getCurrentTime');
 
 const { deleteAvatarFromS3 } = require('../utils/aws-s3');
 require('dotenv').config();
@@ -130,9 +131,10 @@ async function signUp(req, res) {
 
     const encryptedPassword = await bcrypt.hash(password, 10);
 
+    const creationTime = getCurrentISOTime();
     const [newUser] = await pool.query(
-      `INSERT INTO user (name, nickname, email, password, authType)
-       VALUES (?, ?, ?, '${encryptedPassword}', 'local')`, [name, nickname, email]);
+      `INSERT INTO user (name, nickname, email, password, authType, createdAt)
+       VALUES (?, ?, ?, ?, 'local', ?)`, [name, nickname, email, encryptedPassword, creationTime]);
 
     const jwtPayload = {
       user: { id: newUser.insertId }

@@ -1,4 +1,5 @@
 const pool = require('../configs/db-config');
+const getCurrentISOTime = require('../utils/getCurrentTime');
 
 // @ROUTE         GET api/post/all/:startRange
 // @DESCRIPTION   Get all public posts
@@ -47,7 +48,6 @@ async function getPost(req, res) {
   try {
     const [post] = await pool.query(`SELECT title, body, createdAt FROM post
     WHERE postId = ?`, [postId]);
-
     return res.json(post[0]);
   } catch (error) {
     console.log(error);
@@ -81,9 +81,11 @@ async function addPost(req, res) {
   const { title, tag, postBody, privacy } = req.body;
   const userId = req.user.id;
 
+  const postTime = getCurrentISOTime();
+
   try {
-    const [newPost] = await pool.query(`INSERT INTO post (userId, title, body, privacy)
-  VALUES (${userId}, ?, ?, ?)`, [title, postBody, privacy]);
+    const [newPost] = await pool.query(`INSERT INTO post (userId, title, body, privacy, createdAt)
+  VALUES (${userId}, ?, ?, ?, ?)`, [title, postBody, privacy, postTime]);
 
     const newPostId = newPost.insertId;
 
