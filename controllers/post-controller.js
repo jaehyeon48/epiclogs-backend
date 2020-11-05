@@ -78,10 +78,10 @@ async function getTags(req, res) {
 // @DESCRIPTION   add a new post
 // @ACCESS        Private
 async function addPost(req, res) {
-  const { title, tag, postBody, privacy } = req.body;
+  const { title, tag, postBody, privacy, tzOffset } = req.body;
   const userId = req.user.id;
 
-  const postTime = getCurrentISOTime();
+  const postTime = getCurrentISOTime(tzOffset);
 
   try {
     const [newPost] = await pool.query(`INSERT INTO post (userId, title, body, privacy, createdAt)
