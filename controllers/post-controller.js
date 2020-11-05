@@ -1,13 +1,25 @@
 const pool = require('../configs/db-config');
 
-// @ROUTE         GET api/post/all
+// @ROUTE         GET api/post/all/:startRange
 // @DESCRIPTION   Get all public posts
 // @ACCESS        Public
 async function getAllPublicPosts(req, res) {
+  const startRange = parseInt(req.params.startRange);
   const postResult = [];
+  let didReachedLast = false;
   try {
     const [posts] = await pool.query(`SELECT postId, nickname, avatar, title, body, post.createdAt
-    FROM post INNER JOIN user ON post.userId = user.userId WHERE post.privacy = 'public'`);
+    FROM post INNER JOIN user ON post.userId = user.userId WHERE post.privacy = 'public'
+    ORDER BY post.createdAt desc LIMIT ${startRange}, 12`);
+
+    if (!posts[0] && startRange > 0) { // if reached the last element of the table
+      didReachedLast = true;
+      return res.json({ post: [], didReachedLast });
+    }
+    if (!posts[0]) {
+      return res.json({ post: [], didReachedLast });
+    }
+
     for (const [i, post] of posts.entries()) {
       postResult.push(post);
       postResult[i].tags = [];
@@ -18,7 +30,7 @@ async function getAllPublicPosts(req, res) {
         postResult[i].tags.push(tag.tagName);
       });
     }
-    return res.json(postResult);
+    return res.json({ post: postResult, didReachedLast });
   } catch (error) {
     console.log(error);
     res.status(500).json({ errorMsg: 'Internal Server Error' });

@@ -9,10 +9,10 @@ const {
 
 const authMiddleware = require('../middlewares/auth-middleware');
 
-// @ROUTE         GET api/post/all
+// @ROUTE         GET api/post/all/:startRange
 // @DESCRIPTION   Get all public posts
 // @ACCESS        Public
-router.get('/all', getAllPublicPosts);
+router.get('/all/:startRange', getAllPublicPosts);
 
 // @ROUTE         POST api/post/add
 // @DESCRIPTION   add a new post
