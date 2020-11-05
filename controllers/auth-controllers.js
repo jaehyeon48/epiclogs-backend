@@ -115,7 +115,7 @@ function logout(req, res) {
 // @DESCRIPTION   Register user in local
 // @ACCESS        Public
 async function signUp(req, res) {
-  const { name, nickname, email, password } = req.body;
+  const { name, nickname, email, password, tzOffset } = req.body;
   try {
     const [checkExistUser] = await pool.query(`SELECT userId FROM user WHERE email = ? AND authType = 'local'`, [email]);
 
@@ -131,7 +131,7 @@ async function signUp(req, res) {
 
     const encryptedPassword = await bcrypt.hash(password, 10);
 
-    const creationTime = getCurrentISOTime();
+    const creationTime = getCurrentISOTime(tzOffset);
     console.log('================');
     console.log(creationTime);
     console.log('================');
