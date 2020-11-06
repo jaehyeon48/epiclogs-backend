@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 
 const {
-  getAvatar,
+  getAvatarByNickname,
+  getAvatarByUserId,
   modifyUsername,
   modifyNickname,
   modifyPassword,
@@ -12,10 +13,15 @@ const {
 
 const authMiddleware = require('../middlewares/auth-middleware');
 
-// @ROUTE         GET api/user/avatar/:nickname
-// @DESCRIPTION   Get a user's avatar
+// @ROUTE         GET api/user/avatar/nname/:nickname
+// @DESCRIPTION   Get a user's avatar by nickname
 // @ACCESS        Public
-router.get('/avatar/:nickname', getAvatar);
+router.get('/avatar/nname/:nickname', getAvatarByNickname);
+
+// @ROUTE         GET api/user/avatar/id/:userId
+// @DESCRIPTION   Get a user's avatar by userId
+// @ACCESS        Public
+router.get('/avatar/id/:userId', getAvatarByUserId);
 
 
 // @ROUTE         PUT api/user/username

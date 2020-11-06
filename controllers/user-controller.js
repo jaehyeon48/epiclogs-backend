@@ -10,7 +10,7 @@ const {
 // @ROUTE         GET api/user/avatar/:nickname
 // @DESCRIPTION   Get a user's avatar
 // @ACCESS        Public
-async function getAvatar(req, res) {
+async function getAvatarByNickname(req, res) {
   const nickname = req.params.nickname;
 
   try {
@@ -21,6 +21,23 @@ async function getAvatar(req, res) {
     return res.status(500).json({ errorMsg: 'Internal Server Error' });
   }
 }
+
+
+// @ROUTE         GET api/user/avatar/id/:userId
+// @DESCRIPTION   Get a user's avatar by userId
+// @ACCESS        Public
+async function getAvatarByUserId(req, res) {
+  const userId = req.params.userId;
+
+  try {
+    const [avatar] = await pool.query(`SELECT avatar FROM user WHERE userId = ?`, [userId]);
+    return res.json({ avatar: avatar[0].avatar });
+  } catch (error) {
+    console.error(err);
+    return res.status(500).json({ errorMsg: 'Internal Server Error' });
+  }
+}
+
 
 // @ROUTE         PUT api/user/username
 // @DESCRIPTION   Modify username
@@ -121,7 +138,8 @@ async function deleteUserAvatar(req, res) {
 }
 
 module.exports = {
-  getAvatar,
+  getAvatarByNickname,
+  getAvatarByUserId,
   modifyUsername,
   modifyNickname,
   modifyPassword,
