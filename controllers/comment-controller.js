@@ -7,7 +7,7 @@ const getCurrentISOTime = require('../utils/getCurrentTime');
 async function getCommentsOfPost(req, res) {
   const postId = req.params.postId
   try {
-    const [postComments] = await pool.query(`SELECT commentId, userId, commentText, createdAt FROM comment WHERE postId = ?`, [postId]);
+    const [postComments] = await pool.query(`SELECT commentId, userId, commentText, createdAt FROM comment WHERE postId = ? ORDER BY createdAt asc`, [postId]);
     return res.json({ comments: postComments });
   } catch (error) {
     console.log(error);
