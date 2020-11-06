@@ -119,9 +119,35 @@ async function addPost(req, res) {
 }
 
 
+// @ROUTE         DELETE api/post/:postId
+// @DESCRIPTION   Delete a post
+// @ACCESS        Private
+async function deletePost(req, res) {
+  const userId = req.user.id;
+  const postId = req.params.postId;
+
+  try {
+    const [checkPostUserId] = await pool.query(`SELECT userId FROM post WHERE postId = ?`, [postId]);
+
+    if (checkPostUserId[0].userId !== userId) {
+      return res.status(401).json({ errorMsg: 'Invalid deletion request.' });
+    }
+
+    await pool.query(`DELETE FROM postTag WHERE postId = ?`, [postId]);
+    await pool.query(`DELETE FROM post WHERE postId = ?`, [postId]);
+
+    return res.json({ successMsg: 'Successfully deleted the post.' });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ errorMsg: 'Internal Server Error' });
+  }
+}
+
+
 module.exports = {
   getAllPublicPosts,
   getPost,
   getTags,
-  addPost
+  addPost,
+  deletePost
 };

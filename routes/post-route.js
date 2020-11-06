@@ -6,7 +6,8 @@ const {
   getAllPublicPosts,
   getPost,
   getTags,
-  addPost
+  addPost,
+  deletePost
 } = require('../controllers/post-controller');
 
 const authMiddleware = require('../middlewares/auth-middleware');
@@ -33,5 +34,11 @@ router.get('/tags/:postId', getTags);
 // @DESCRIPTION   add a new post
 // @ACCESS        Private
 router.post('/add', authMiddleware, addPost);
+
+
+// @ROUTE         DELETE api/post/:postId
+// @DESCRIPTION   Delete a post
+// @ACCESS        Private
+router.delete('/:postId', authMiddleware, deletePost);
 
 module.exports = router;
