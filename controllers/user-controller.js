@@ -7,6 +7,21 @@ const {
 } = require('../utils/aws-s3');
 
 
+// @ROUTE         GET api/user/nickname/:userId
+// @DESCRIPTION   Get user's nickname by userId
+// @ACCESS        Public
+async function getUserNickname(req, res) {
+  const userId = req.params.userId;
+
+  try {
+    const [nickname] = await pool.query(`SELECT nickname FROM user WHERE userId = ?`, [userId]);
+    return res.json({ nickname: nickname[0].nickname });
+  } catch (error) {
+    console.error(err);
+    return res.status(500).json({ errorMsg: 'Internal Server Error' });
+  }
+}
+
 // @ROUTE         GET api/user/avatar/:nickname
 // @DESCRIPTION   Get a user's avatar
 // @ACCESS        Public
@@ -138,6 +153,7 @@ async function deleteUserAvatar(req, res) {
 }
 
 module.exports = {
+  getUserNickname,
   getAvatarByNickname,
   getAvatarByUserId,
   modifyUsername,
