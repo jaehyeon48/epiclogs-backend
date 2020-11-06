@@ -17,7 +17,7 @@ async function getUserNickname(req, res) {
     const [nickname] = await pool.query(`SELECT nickname FROM user WHERE userId = ?`, [userId]);
     return res.json({ nickname: nickname[0].nickname });
   } catch (error) {
-    console.error(err);
+    console.error(error);
     return res.status(500).json({ errorMsg: 'Internal Server Error' });
   }
 }
