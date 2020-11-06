@@ -34,7 +34,32 @@ async function addComment(req, res) {
   }
 }
 
+
+// @ROUTE         DELETE api/comment/:commentId
+// @DESCRIPTION   Delete A comment
+// @ACCESS        Private
+async function deleteComment(req, res) {
+  const userId = req.user.id;
+  const commentId = req.params.commentId;
+
+  try {
+    const [checkCommentUserId] = await pool.query(`SELECT userId FROM comment WHERE commentId = ?`, [commentId]);
+
+    if (checkCommentUserId[0].userId !== userId) {
+      return res.status(401).json({ errorMsg: 'Invalid deletion request.' });
+    }
+
+    await pool.query(`DELETE FROM comment WHERE commentId = ?`, [commentId]);
+
+    return res.json({ successMsg: 'Successfully deleted the comment.' });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ errorMsg: 'Internal Server Error' });
+  }
+}
+
 module.exports = {
   addComment,
-  getCommentsOfPost
+  getCommentsOfPost,
+  deleteComment
 };
