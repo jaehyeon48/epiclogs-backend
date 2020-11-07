@@ -46,7 +46,7 @@ async function getPost(req, res) {
   const postId = req.params.postId;
 
   try {
-    const [post] = await pool.query(`SELECT title, body, privacy, createdAt FROM post
+    const [post] = await pool.query(`SELECT title, body, privacy, isEdited, createdAt FROM post
     WHERE postId = ?`, [postId]);
     return res.json(post[0]);
   } catch (error) {
