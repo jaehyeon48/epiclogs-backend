@@ -7,6 +7,7 @@ const {
   getPost,
   getTags,
   addPost,
+  editPost,
   deletePost
 } = require('../controllers/post-controller');
 
@@ -34,6 +35,12 @@ router.get('/tags/:postId', getTags);
 // @DESCRIPTION   add a new post
 // @ACCESS        Private
 router.post('/add', authMiddleware, addPost);
+
+
+// @ROUTE         PUT api/post/:postId
+// @DESCRIPTION   Edit a post
+// @ACCESS        Private
+router.put('/:postId', authMiddleware, editPost);
 
 
 // @ROUTE         DELETE api/post/:postId

@@ -119,6 +119,50 @@ async function addPost(req, res) {
 }
 
 
+// @ROUTE         PUT api/post/:postId
+// @DESCRIPTION   Edit a post
+// @ACCESS        Private
+async function editPost(req, res) {
+  const { title, tag, postBody, privacy } = req.body;
+  const userId = req.user.id;
+  const postId = parseInt(req.params.postId);
+
+  try {
+    await pool.query(`UPDATE post SET userId = ?, title = ?, body = ?, privacy = ?, isEdited = true WHERE postId = ?`, [userId, title, postBody, privacy, postId]);
+
+    // delete all previous tags
+    await pool.query(`DELETE FROM postTag WHERE postId = ?`, [postId]);
+
+    // add tag(s)
+    if (tag.length > 0) {
+      tag.forEach(async tagName => {
+        const [tagId] = await pool.query(`SELECT tagId FROM tag WHERE tagName = ?`, [tagName]);
+
+        if (!tagId[0]) {
+          const [newTag] = await pool.query(`INSERT INTO tag (tagName) VALUES (?)`, [tagName]);
+
+          await pool.query(`INSERT INTO postTag (postId, tagId)
+        VALUES (?, ?)`, [postId, newTag.insertId]);
+        }
+        else {
+          await pool.query(`INSERT INTO postTag (postId, tagId)
+        VALUES (?, ?)`, [postId, tagId[0].tagId]);
+        }
+      });
+    }
+
+    const [userNickname] = await pool.query(`SELECT nickname FROM user WHERE userId = ${userId}`);
+    res.status(200).json({
+      url: `/${userNickname[0].nickname}/${postId}`,
+      successMsg: 'successfully posted!'
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ errorMsg: 'Internal Server Error' });
+  }
+}
+
+
 // @ROUTE         DELETE api/post/:postId
 // @DESCRIPTION   Delete a post
 // @ACCESS        Private
@@ -149,5 +193,6 @@ module.exports = {
   getPost,
   getTags,
   addPost,
+  editPost,
   deletePost
 };
