@@ -48,7 +48,48 @@ async function getPost(req, res) {
   try {
     const [post] = await pool.query(`SELECT title, body, privacy, isEdited, createdAt FROM post
     WHERE postId = ?`, [postId]);
+
     return res.json(post[0]);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ errorMsg: 'Internal Server Error' });
+  }
+}
+
+
+// @ROUTE         GET api/post/user/:startRange
+// @DESCRIPTION   Get all posts of a user
+// @ACCESS        Private
+async function getPostsOfUser(req, res) {
+  const startRange = parseInt(req.params.startRange);
+  const postResult = [];
+  const userId = req.user.id;
+  let didReachedLast = false;
+
+  try {
+    const [posts] = await pool.query(`SELECT postId, nickname, title, post.createdAt
+    FROM post INNER JOIN user ON post.userId = user.userId WHERE user.userId = ?
+    ORDER BY post.createdAt desc LIMIT ${startRange}, 12`, [userId]);
+
+    if (!posts[0] && startRange > 0) { // if reached the last element of the table
+      didReachedLast = true;
+      return res.json({ post: [], didReachedLast });
+    }
+    if (!posts[0]) {
+      return res.json({ post: [], didReachedLast });
+    }
+
+    for (const [i, post] of posts.entries()) {
+      postResult.push(post);
+      postResult[i].tags = [];
+      const [postTags] = await pool.query(`SELECT tagName FROM tag INNER JOIN postTag
+        ON postId = ? AND postTag.tagId = tag.tagId`, [post.postId]);
+
+      postTags.forEach((tag) => {
+        postResult[i].tags.push(tag.tagName);
+      });
+    }
+    return res.json({ post: postResult, didReachedLast });
   } catch (error) {
     console.log(error);
     res.status(500).json({ errorMsg: 'Internal Server Error' });
@@ -191,6 +232,7 @@ async function deletePost(req, res) {
 module.exports = {
   getAllPublicPosts,
   getPost,
+  getPostsOfUser,
   getTags,
   addPost,
   editPost,

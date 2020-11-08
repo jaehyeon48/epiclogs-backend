@@ -5,6 +5,7 @@ const pool = require('../configs/db-config');
 const {
   getAllPublicPosts,
   getPost,
+  getPostsOfUser,
   getTags,
   addPost,
   editPost,
@@ -17,6 +18,12 @@ const authMiddleware = require('../middlewares/auth-middleware');
 // @DESCRIPTION   Get all public posts
 // @ACCESS        Public
 router.get('/all/:startRange', getAllPublicPosts);
+
+
+// @ROUTE         GET api/post/user/:startRange
+// @DESCRIPTION   Get all posts of a user
+// @ACCESS        Private
+router.get('/user/:startRange', authMiddleware, getPostsOfUser);
 
 
 // @ROUTE         GET api/post/:postId
