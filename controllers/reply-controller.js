@@ -55,8 +55,35 @@ async function addReply(req, res) {
   }
 }
 
+// @ROUTE         PUT api/reply/:replyId
+// @DESCRIPTION   Edit a reply
+// @ACCESS        Private
+async function editReply(req, res) {
+  const userId = req.user.id;
+  const replyId = req.params.replyId;
+  const { reply } = req.body;
+
+  try {
+    const [checkReplyUserMatch] = await pool.query(`SELECT userId FROM reply
+      WHERE userId = ? AND replyId = ?`, [userId, replyId]);
+
+    if (!checkReplyUserMatch[0]) {
+      res.status(400).json({ errorMsg: 'Not allowed to edit the reply' });
+    }
+
+    await pool.query(`UPDATE reply SET replyText = ?, isEdited = true 
+      WHERE replyId = ?`, [reply, replyId]);
+
+    res.json({ successMsg: 'Successfully updated a reply' });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ errorMsg: 'Internal Server Error' });
+  }
+}
+
 module.exports = {
   getReplyOfComment,
   getReplyUserInfo,
-  addReply
+  addReply,
+  editReply
 };

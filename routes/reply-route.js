@@ -4,7 +4,8 @@ const router = express.Router();
 const {
   getReplyOfComment,
   getReplyUserInfo,
-  addReply
+  addReply,
+  editReply
 } = require('../controllers/reply-controller');
 
 const authMiddleware = require('../middlewares/auth-middleware');
@@ -26,5 +27,11 @@ router.get('/:commentId', getReplyOfComment);
 // @DESCRIPTION   Add a reply
 // @ACCESS        Private
 router.post('/:commentId', authMiddleware, addReply);
+
+
+// @ROUTE         PUT api/reply/:replyId
+// @DESCRIPTION   Edit a reply
+// @ACCESS        Private
+router.put('/:replyId', authMiddleware, editReply);
 
 module.exports = router;
