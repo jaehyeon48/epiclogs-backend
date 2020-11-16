@@ -3,16 +3,24 @@ const router = express.Router();
 
 const {
   getReplyOfComment,
+  getReplyUserInfo,
   addReply
 } = require('../controllers/reply-controller');
 
 const authMiddleware = require('../middlewares/auth-middleware');
 
 
+// @ROUTE         GET api/reply/user/:userId
+// @DESCRIPTION   Get reply commenter's info
+// @ACCESS        Public
+router.get('/user/:userId', getReplyUserInfo);
+
+
 // @ROUTE         GET api/reply/:commentId
 // @DESCRIPTION   Get a comment's reply
 // @ACCESS        Public
 router.get('/:commentId', getReplyOfComment);
+
 
 // @ROUTE         POST api/reply/:commentId
 // @DESCRIPTION   Add a reply
