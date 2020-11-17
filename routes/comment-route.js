@@ -5,6 +5,7 @@ const pool = require('../configs/db-config');
 const authMiddleware = require('../middlewares/auth-middleware');
 const {
   addComment,
+  editComment,
   getCommentsOfPost,
   deleteComment
 } = require('../controllers/comment-controller');
@@ -21,8 +22,14 @@ router.get('/post/:postId', getCommentsOfPost);
 router.post('/add', authMiddleware, addComment);
 
 
+// @ROUTE         PUT api/comment/:commentId
+// @DESCRIPTION   Edit a comment
+// @ACCESS        Private
+router.put('/:commentId', authMiddleware, editComment);
+
+
 // @ROUTE         DELETE api/comment/:commentId
-// @DESCRIPTION   Delete A comment
+// @DESCRIPTION   Delete A comment (soft delete)
 // @ACCESS        Private
 router.delete('/:commentId', authMiddleware, deleteComment);
 

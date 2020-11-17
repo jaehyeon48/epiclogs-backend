@@ -7,7 +7,7 @@ const getCurrentISOTime = require('../utils/getCurrentTime');
 async function getCommentsOfPost(req, res) {
   const postId = req.params.postId
   try {
-    const [postComments] = await pool.query(`SELECT commentId, userId, commentText, createdAt FROM comment WHERE postId = ? ORDER BY createdAt asc`, [postId]);
+    const [postComments] = await pool.query(`SELECT commentId, userId, commentText, createdAt, isEdited, isDeleted FROM comment WHERE postId = ? ORDER BY createdAt asc`, [postId]);
     return res.json({ comments: postComments });
   } catch (error) {
     console.log(error);
@@ -34,9 +34,34 @@ async function addComment(req, res) {
   }
 }
 
+// @ROUTE         PUT api/comment/:commentId
+// @DESCRIPTION   Edit a comment
+// @ACCESS        Private
+async function editComment(req, res) {
+  const userId = req.user.id;
+  const commentId = req.params.commentId;
+  const { editCommentText } = req.body;
+
+  try {
+    const [checkCommentUserId] = await pool.query(`SELECT userId FROM comment WHERE commentId = ?`, [commentId]);
+
+    if (checkCommentUserId[0].userId !== userId) {
+      return res.status(401).json({ errorMsg: 'Invalid update request.' });
+    }
+
+    await pool.query(`UPDATE comment SET commentText = ?, isEdited = true WHERE commentId = ?`,
+      [editCommentText, commentId]);
+
+    return res.json({ successMsg: 'Successfully updated the comment.' });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ errorMsg: 'Internal Server Error' });
+  }
+}
+
 
 // @ROUTE         DELETE api/comment/:commentId
-// @DESCRIPTION   Delete A comment
+// @DESCRIPTION   Delete A comment (soft delete)
 // @ACCESS        Private
 async function deleteComment(req, res) {
   const userId = req.user.id;
@@ -49,7 +74,7 @@ async function deleteComment(req, res) {
       return res.status(401).json({ errorMsg: 'Invalid deletion request.' });
     }
 
-    await pool.query(`DELETE FROM comment WHERE commentId = ?`, [commentId]);
+    await pool.query(`UPDATE comment SET isDeleted = true WHERE commentId = ?`, [commentId]);
 
     return res.json({ successMsg: 'Successfully deleted the comment.' });
   } catch (error) {
@@ -61,5 +86,6 @@ async function deleteComment(req, res) {
 module.exports = {
   addComment,
   getCommentsOfPost,
+  editComment,
   deleteComment
 };
