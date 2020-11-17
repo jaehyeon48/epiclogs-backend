@@ -18,6 +18,23 @@ async function getReplyOfComment(req, res) {
   }
 }
 
+
+// @ROUTE         GET api/reply/one/:replyId
+// @DESCRIPTION   Get a reply
+// @ACCESS        Public
+async function getAReply(req, res) {
+  const replyId = req.params.replyId;
+
+  try {
+    const [reply] = await pool.query(`SELECT * FROM reply WHERE replyId = ?`, [replyId]);
+
+    res.json(reply);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ errorMsg: 'Internal Server Error' });
+  }
+}
+
 // @ROUTE         GET api/reply/user/:userId
 // @DESCRIPTION   Get reply commenter's info
 // @ACCESS        Public
@@ -83,6 +100,7 @@ async function editReply(req, res) {
 
 module.exports = {
   getReplyOfComment,
+  getAReply,
   getReplyUserInfo,
   addReply,
   editReply
